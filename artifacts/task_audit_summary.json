@@ -1,0 +1,22 @@
+{
+  "tasks": 480,
+  "split_counts": {
+    "test": 120,
+    "train": 300,
+    "validation": 60
+  },
+  "family_counts": {
+    "cancel_processing": 96,
+    "cancel_shipped": 96,
+    "exchange_cheaper": 96,
+    "return_eligible": 96,
+    "return_expired": 96
+  },
+  "expert_successes": 480,
+  "noop_successes": 0,
+  "direct_shortcut_successes": 0,
+  "mean_expert_shaped_reward": 1.4000000000000001,
+  "entity_overlap_across_splits": 0,
+  "task_sha256": "f02f0661f86f337d9bb38244f3f6253685616b19b89ee22ba7cfc040eaa3da7a",
+  "status": "pass"
+}

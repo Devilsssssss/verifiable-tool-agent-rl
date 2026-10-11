@@ -1,0 +1,119 @@
+{
+  "tasks": 120,
+  "expert": {
+    "overall": {
+      "tasks": 120,
+      "task_success": 1.0,
+      "policy_compliance": 1.0,
+      "mean_valid_tool_rate": 1.0,
+      "mean_steps": 5.0,
+      "mean_progress": 1.0,
+      "mean_shaped_reward": 1.4000000000000001
+    },
+    "by_family": {
+      "cancel_processing": {
+        "tasks": 24,
+        "task_success": 1.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 1.0,
+        "mean_steps": 5.0,
+        "mean_progress": 1.0,
+        "mean_shaped_reward": 1.4000000000000001
+      },
+      "cancel_shipped": {
+        "tasks": 24,
+        "task_success": 1.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 1.0,
+        "mean_steps": 4.0,
+        "mean_progress": 1.0,
+        "mean_shaped_reward": 1.4000000000000001
+      },
+      "exchange_cheaper": {
+        "tasks": 24,
+        "task_success": 1.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 1.0,
+        "mean_steps": 7.0,
+        "mean_progress": 1.0,
+        "mean_shaped_reward": 1.4000000000000001
+      },
+      "return_eligible": {
+        "tasks": 24,
+        "task_success": 1.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 1.0,
+        "mean_steps": 5.0,
+        "mean_progress": 1.0,
+        "mean_shaped_reward": 1.4000000000000001
+      },
+      "return_expired": {
+        "tasks": 24,
+        "task_success": 1.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 1.0,
+        "mean_steps": 4.0,
+        "mean_progress": 1.0,
+        "mean_shaped_reward": 1.4000000000000001
+      }
+    }
+  },
+  "noop": {
+    "overall": {
+      "tasks": 120,
+      "task_success": 0.0,
+      "policy_compliance": 1.0,
+      "mean_valid_tool_rate": 0.0,
+      "mean_steps": 0.0,
+      "mean_progress": 0.0,
+      "mean_shaped_reward": -0.2
+    },
+    "by_family": {
+      "cancel_processing": {
+        "tasks": 24,
+        "task_success": 0.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 0.0,
+        "mean_steps": 0.0,
+        "mean_progress": 0.0,
+        "mean_shaped_reward": -0.20000000000000004
+      },
+      "cancel_shipped": {
+        "tasks": 24,
+        "task_success": 0.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 0.0,
+        "mean_steps": 0.0,
+        "mean_progress": 0.0,
+        "mean_shaped_reward": -0.20000000000000004
+      },
+      "exchange_cheaper": {
+        "tasks": 24,
+        "task_success": 0.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 0.0,
+        "mean_steps": 0.0,
+        "mean_progress": 0.0,
+        "mean_shaped_reward": -0.20000000000000004
+      },
+      "return_eligible": {
+        "tasks": 24,
+        "task_success": 0.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 0.0,
+        "mean_steps": 0.0,
+        "mean_progress": 0.0,
+        "mean_shaped_reward": -0.20000000000000004
+      },
+      "return_expired": {
+        "tasks": 24,
+        "task_success": 0.0,
+        "policy_compliance": 1.0,
+        "mean_valid_tool_rate": 0.0,
+        "mean_steps": 0.0,
+        "mean_progress": 0.0,
+        "mean_shaped_reward": -0.20000000000000004
+      }
+    }
+  }
+}
