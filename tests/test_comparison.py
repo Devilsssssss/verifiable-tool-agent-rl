@@ -55,3 +55,41 @@ def test_paired_comparison_rejects_changed_generation_budget(tmp_path: Path) -> 
     save_run(candidate, [True, True], budget=1024)
     with pytest.raises(ValueError, match="max_new_tokens"):
         MODULE.compare_pair(baseline, candidate)
+
+
+def test_paired_comparison_rejects_oracle_even_if_metadata_matches(tmp_path: Path) -> None:
+    baseline, candidate = tmp_path / "before.jsonl", tmp_path / "assisted.jsonl"
+    save_run(baseline, [False])
+    save_run(candidate, [True])
+    write_jsonl(
+        candidate,
+        [
+            {
+                "task_id": "0",
+                "family": "cancel_processing",
+                "success": True,
+                "oracle_first_lookup": True,
+            }
+        ],
+    )
+    with pytest.raises(ValueError, match="oracle-assisted"):
+        MODULE.compare_pair(baseline, candidate)
+
+
+def test_paired_comparison_rejects_input_intervention_even_if_metadata_matches(tmp_path: Path) -> None:
+    baseline, candidate = tmp_path / "before.jsonl", tmp_path / "prompt-change.jsonl"
+    save_run(baseline, [False])
+    save_run(candidate, [True])
+    write_jsonl(
+        candidate,
+        [
+            {
+                "task_id": "0",
+                "family": "cancel_processing",
+                "success": True,
+                "input_intervention": "explicit-email-field-v1",
+            }
+        ],
+    )
+    with pytest.raises(ValueError, match="input interventions"):
+        MODULE.compare_pair(baseline, candidate)

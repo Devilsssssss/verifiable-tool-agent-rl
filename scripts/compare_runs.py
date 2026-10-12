@@ -32,6 +32,10 @@ def compare_pair(baseline: Path, candidate: Path, *, seed: int = 42) -> dict:
     if missing or mismatch:
         raise ValueError(f"incomparable protocols: missing={missing}, mismatched={mismatch}")
     runs = [read_jsonl(path) for path in (baseline, candidate)]
+    if any(row.get("oracle_first_lookup", False) for rows in runs for row in rows):
+        raise ValueError("oracle-assisted diagnostics cannot enter unaided model comparisons")
+    if any(row.get("input_intervention", "original") != "original" for rows in runs for row in rows):
+        raise ValueError("input interventions require a separate comparison protocol")
     indexed = [{row["task_id"]: row for row in rows} for rows in runs]
     if any(len(index) != len(rows) for index, rows in zip(indexed, runs, strict=True)):
         raise ValueError("duplicate task IDs in rollouts")

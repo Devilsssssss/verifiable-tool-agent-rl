@@ -24,6 +24,12 @@ def main() -> int:
     args = parser.parse_args()
     tasks = {task.task_id: task for task in load_tasks(args.tasks)}
     records = read_jsonl(args.rollouts)
+    assisted = [bool(record.get("oracle_first_lookup", False)) for record in records]
+    if any(assisted) and not all(assisted):
+        raise ValueError("cannot pool oracle-assisted and unaided rollouts")
+    interventions = {record.get("input_intervention", "original") for record in records}
+    if len(interventions) != 1:
+        raise ValueError("cannot pool different input interventions")
     seen = set()
     reports = []
     wrong_email_tasks = 0
@@ -54,6 +60,8 @@ def main() -> int:
         )
         reports.append({"family": task.family, **report})
     summary = {
+        "scoring_context": "oracle-assisted diagnostic" if any(assisted) else "unaided",
+        "input_intervention": next(iter(interventions)),
         "rollouts": str(args.rollouts),
         "tasks": str(args.tasks),
         "replay_verified": len(reports),

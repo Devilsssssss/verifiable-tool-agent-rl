@@ -1,0 +1,78 @@
+{
+  "mode": "factorial",
+  "adapter": "outputs/qwen3-1.7b-tool-sft-repair-v8",
+  "tasks": "data/diverse-v8/tasks_train.jsonl",
+  "tasks_sha256": "e3684c5c2d24371d6dd65ccbdc53b92dd30a36d217f591e3c9108773331ef48f",
+  "seed": 42,
+  "temperature": 0,
+  "max_new_tokens": 512,
+  "scope": "Development diagnostic only; oracle scores are assisted, not unaided results.",
+  "calls": 80,
+  "correct_email_calls": 79,
+  "cells": {
+    "frame-0/hash": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-0/long_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-0/seen": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-0/short_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-1/hash": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-1/long_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-1/seen": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-1/short_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-2/hash": {
+      "calls": 5,
+      "correct": 4
+    },
+    "frame-2/long_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-2/seen": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-2/short_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-3/hash": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-3/long_numeric": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-3/seen": {
+      "calls": 5,
+      "correct": 5
+    },
+    "frame-3/short_numeric": {
+      "calls": 5,
+      "correct": 5
+    }
+  }
+}

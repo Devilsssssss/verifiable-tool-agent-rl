@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from collections.abc import Callable
+from copy import deepcopy
 from typing import Any
 
 from .formatting import INPUT_FORMAT, canonical_messages, canonical_tool_schemas
@@ -79,6 +80,7 @@ class TransformersToolPolicy:
         temperature: float = 0.0,
         top_p: float = 0.9,
         input_format: str = INPUT_FORMAT,
+        capture_generation: bool = False,
     ) -> None:
         from trl.chat_template_utils import add_response_schema, get_training_chat_template
 
@@ -93,6 +95,8 @@ class TransformersToolPolicy:
         if input_format not in (INPUT_FORMAT, "legacy-v3"):
             raise ValueError(f"unsupported input format: {input_format}")
         self.input_format = input_format
+        self.capture_generation = capture_generation
+        self.last_generation: dict[str, Any] | None = None
 
     def __call__(
         self,
@@ -127,6 +131,15 @@ class TransformersToolPolicy:
             completion_ids,
             prefix=encoded["input_ids"][0].tolist(),
         )
+        parsed_response = deepcopy(response) if self.capture_generation else None
         response = normalize_tool_response(response)
+        if self.capture_generation:
+            self.last_generation = {
+                "raw_completion": self.tokenizer.decode(completion_ids, skip_special_tokens=False),
+                "completion_ids": completion_ids,
+                "prompt_tokens": prompt_length,
+                "parsed_response": parsed_response,
+                "normalized_response": deepcopy(response),
+            }
         response["_generated_tokens"] = len(completion_ids)
         return response

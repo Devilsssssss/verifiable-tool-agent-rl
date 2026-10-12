@@ -1,0 +1,43 @@
+{
+  "stage": "sft",
+  "base_model": "models/Qwen3-1.7B",
+  "train_samples": 1000,
+  "primary_train_samples": 300,
+  "extra_train_samples": 700,
+  "validation_samples": 120,
+  "primary_validation_samples": 60,
+  "extra_validation_samples": 60,
+  "epochs": 1.0,
+  "learning_rate": 5e-05,
+  "max_length": 4096,
+  "seed": 45,
+  "assistant_only_loss": true,
+  "completion_only_loss": true,
+  "repair_prefix_supervised": false,
+  "input_format": "canonical-v4",
+  "batch_size": 1,
+  "gradient_accumulation": 8,
+  "optimizer_steps": 125,
+  "train_metrics": {
+    "train_runtime": 597.8951,
+    "train_samples_per_second": 1.673,
+    "train_steps_per_second": 0.209,
+    "total_flos": 1.86865357968384e+16,
+    "train_loss": 0.07880508360126987,
+    "epoch": 1.0
+  },
+  "dataset_sha256": {
+    "data/factorial-v9/sft_train.jsonl": "57bae1f237dce4e316df1eba1fd66a0128b2bd4891285fd6377be3131cf971a8",
+    "data/factorial-v9/sft_repair_lookup_train.jsonl": "a17b7a08b343e87e28c138d034737b4fa6490707ceaa967d4e0aef6a1ed0a948",
+    "data/generated/sft_validation.jsonl": "23a0776ea2ecdaaa0a19988d9a45159f52f45916b6f161461313b36aa0f532ff",
+    "data/generated/sft_repair_validation.jsonl": "2ca24adb9c722aa873a4482459fa80a89991959798faab96a9be61544ab5d0bb"
+  },
+  "libraries": {
+    "torch": "2.5.1",
+    "transformers": "5.2.0",
+    "trl": "1.14.2",
+    "datasets": "5.1.0",
+    "peft": "0.21.2",
+    "pyarrow": "25.0.1"
+  }
+}
