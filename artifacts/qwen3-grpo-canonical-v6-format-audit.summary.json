@@ -1,0 +1,7 @@
+{
+  "input_format": "canonical-v4",
+  "samples": 900,
+  "assistant_prefixes_checked": 4200,
+  "mismatched_prefixes": 0,
+  "examples": []
+}

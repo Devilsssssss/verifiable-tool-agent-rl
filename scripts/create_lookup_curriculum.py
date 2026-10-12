@@ -20,13 +20,15 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Add training-only first-lookup supervision")
     parser.add_argument("--data-dir", type=Path, default=ROOT / "data/diverse")
     parser.add_argument("--seed", type=int, default=45)
+    parser.add_argument("--profile", choices=("v6", "v7"), default="v6")
+    parser.add_argument("--output-dir", type=Path)
     parser.add_argument(
         "--summary", type=Path, default=ROOT / "artifacts/lookup-curriculum.summary.json"
     )
     args = parser.parse_args()
     source = args.data_dir / "tasks_train.jsonl"
     tasks = load_tasks(source)
-    rows = [lookup_training_row(task, seed=args.seed) for task in tasks]
+    rows = [lookup_training_row(task, seed=args.seed, profile=args.profile) for task in tasks]
     for task, row in zip(tasks, rows, strict=True):
         env = RetailToolEnvironment()
         reset_environment(env, task)
@@ -35,11 +37,13 @@ def main() -> int:
         if result.get("user", {}).get("id") != task.initial_state["users"][0]["id"]:
             raise ValueError(f"lookup curriculum fails replay: {task.task_id}")
     repairs = read_jsonl(args.data_dir / "sft_repair_train.jsonl")
-    write_jsonl(args.data_dir / "sft_lookup_train.jsonl", rows)
-    extra_path = args.data_dir / "sft_repair_lookup_train.jsonl"
+    output_dir = args.output_dir or args.data_dir
+    write_jsonl(output_dir / "sft_lookup_train.jsonl", rows)
+    extra_path = output_dir / "sft_repair_lookup_train.jsonl"
     write_jsonl(extra_path, repairs + rows)
     summary = {
         "seed": args.seed,
+        "profile": args.profile,
         "independent_training_tasks": len(tasks),
         "normal_views": len(tasks),
         "repair_views": len(repairs),
@@ -50,6 +54,7 @@ def main() -> int:
         "source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
         "extra_sha256": hashlib.sha256(extra_path.read_bytes()).hexdigest(),
         "development_driven": True,
+        "shares_generic_validation_email_frame": args.profile == "v7",
         "held_out_modified": False,
         "scope": "First-call supervision; does not add independent business tasks.",
     }

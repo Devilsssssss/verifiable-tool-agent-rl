@@ -27,3 +27,12 @@ def test_lookup_curriculum_preserves_real_training_entities_and_masks_context() 
         result = json.loads(env.lookup_user(email))
         assert result["user"]["id"] == task.initial_state["users"][0]["id"]
         assert not env.reward_report["terminal_goal_satisfied"]
+
+
+def test_targeted_backfill_is_explicit_and_uses_training_email() -> None:
+    task = generate_tasks({"train": 5})[0]
+    row = lookup_training_row(task, profile="v7")
+    assert row["lookup_profile"] == "v7"
+    assert row["messages"][1]["content"].startswith("For account train.")
+    with pytest.raises(ValueError, match="profile"):
+        lookup_training_row(task, profile="unknown")

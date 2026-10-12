@@ -1,0 +1,26 @@
+{
+  "adapter": "outputs/qwen3-1.7b-tool-sft-repair-v6",
+  "tasks": "data/generated/tasks_validation.jsonl",
+  "seed": 42,
+  "temperature": 0,
+  "max_new_tokens": 512,
+  "scope": "Diagnostic first-call probe; no business task success is measured.",
+  "conditions": {
+    "original": {
+      "calls": 5,
+      "correct_email_calls": 0
+    },
+    "training-wording-0": {
+      "calls": 5,
+      "correct_email_calls": 5
+    },
+    "training-wording-1": {
+      "calls": 5,
+      "correct_email_calls": 5
+    },
+    "training-wording-2": {
+      "calls": 5,
+      "correct_email_calls": 5
+    }
+  }
+}

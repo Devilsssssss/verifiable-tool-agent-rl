@@ -1,0 +1,39 @@
+{
+  "runs": [
+    {
+      "path": "outputs/qwen3-1.7b-grpo-sparse-formal-v1/checkpoint-30/trainer_state.json",
+      "sha256": "f2474c7bbd7c93adc5adff913147da8798d0f1333cd748b11a2ef443cda0130e",
+      "checkpoint_global_step": 30,
+      "logged_reward_steps": 30,
+      "first_step": 1,
+      "last_step": 30,
+      "mean_reward": 0.9583333333333334,
+      "mean_reward_std": 0.016666666666666666,
+      "mean_zero_std_group_fraction": 0.9666666666666667,
+      "steps_with_any_nonconstant_group": 1,
+      "steps_with_positive_reward_std": 1,
+      "mean_grad_norm": 0.003197241330741877,
+      "mean_truncation_fraction": 0.0,
+      "mean_tool_calls_per_completion": 5.175,
+      "mean_tool_failures_per_completion": 0.0027777778605620066
+    },
+    {
+      "path": "outputs/qwen3-1.7b-grpo-shaped-formal-v1/checkpoint-30/trainer_state.json",
+      "sha256": "ade3d68da6bd9ffe26e7504dae1e00f8de84267f790e01126941aff3d4dbd22c",
+      "checkpoint_global_step": 30,
+      "logged_reward_steps": 30,
+      "first_step": 1,
+      "last_step": 30,
+      "mean_reward": 1.3703888654708862,
+      "mean_reward_std": 0.05922222336133321,
+      "mean_zero_std_group_fraction": 0.9333333333333333,
+      "steps_with_any_nonconstant_group": 2,
+      "steps_with_positive_reward_std": 2,
+      "mean_grad_norm": 0.01072461020997122,
+      "mean_truncation_fraction": 0.0,
+      "mean_tool_calls_per_completion": 5.2,
+      "mean_tool_failures_per_completion": 0.0
+    }
+  ],
+  "scope": "Means of per-step Trainer diagnostics, not a pooled rollout success rate. Constant reward groups have zero reward advantages; KL can still give gradients."
+}

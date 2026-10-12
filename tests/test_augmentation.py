@@ -24,3 +24,19 @@ def test_augmented_tasks_preserve_goals_and_replay_across_all_families() -> None
         augmented.append(varied)
     held_out = [task for task in tasks if task.split != "train"]
     assert entity_tokens(augmented).isdisjoint(entity_tokens(held_out))
+
+
+def test_numeric_email_augmentation_replays_and_has_no_reserved_split_prefix() -> None:
+    tasks = generate_tasks({"train": 60, "validation": 10, "test": 10})
+    varied = [
+        diversify_training_task(task, profile="v8") for task in tasks if task.split == "train"
+    ]
+    assert any(task.initial_state["users"][0]["email"].endswith("@example.test") for task in varied)
+    assert any(task.initial_state["users"][0]["email"].endswith("@mailbox.test") for task in varied)
+    for task in varied:
+        email = task.initial_state["users"][0]["email"]
+        assert not email.startswith(("train.", "validation.", "test."))
+        assert replay_expert(task)["reward_report"]["success"]
+    assert entity_tokens(varied).isdisjoint(
+        entity_tokens(task for task in tasks if task.split != "train")
+    )

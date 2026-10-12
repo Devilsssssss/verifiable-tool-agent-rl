@@ -1,0 +1,26 @@
+{
+  "baseline": "artifacts\\qwen3-base-canonical-validation-20.jsonl",
+  "candidate": "artifacts\\qwen3-1.7b-tool-sft-repair-v7-validation-20.jsonl",
+  "paired_tasks": 20,
+  "protocol": {
+    "tasks_sha256": "486f40e7bb804155471e3707575d536f63395ac5cf3a93886f2a7e6d16dd9942",
+    "limit": 20,
+    "seed": 42,
+    "temperature": 0.0,
+    "max_new_tokens": 512,
+    "input_format": "canonical-v4",
+    "scoring_protocol": "strict-v1-with-terminal-diagnostics"
+  },
+  "baseline_successes": 0,
+  "candidate_successes": 0,
+  "gained_tasks": 0,
+  "lost_tasks": 0,
+  "strict_success_difference": 0.0,
+  "paired_bootstrap_95_interval": [
+    0.0,
+    0.0
+  ],
+  "bootstrap_seed": 42,
+  "bootstrap_resamples": 5000,
+  "scope": "Exploratory paired task bootstrap; tasks share synthetic templates. Does not quantify model-training seed variability or establish causality. A degenerate all-zero interval is not evidence of population equivalence."
+}

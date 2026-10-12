@@ -37,7 +37,9 @@ TRAINING_REQUESTS = {
 }
 
 
-def diversify_training_task(task: AgentTask, *, seed: int = 45) -> AgentTask:
+def diversify_training_task(
+    task: AgentTask, *, seed: int = 45, profile: str = "v5"
+) -> AgentTask:
     """Vary visible training entities and wording without touching held-out tasks.
 
     IDs, prices, state, goal and action budget stay fixed. One transformed task
@@ -45,6 +47,8 @@ def diversify_training_task(task: AgentTask, *, seed: int = 45) -> AgentTask:
     """
     if task.split != "train":
         raise ValueError("augmentation is restricted to training tasks")
+    if profile not in {"v5", "v8"}:
+        raise ValueError("unknown augmentation profile")
     digest = hashlib.sha256(f"{seed}:{task.task_id}".encode()).hexdigest()
     rng = random.Random(int(digest, 16))
     code = digest[:10]
@@ -52,6 +56,20 @@ def diversify_training_task(task: AgentTask, *, seed: int = 45) -> AgentTask:
     stem = rng.choice(names)
     email = rng.choice((f"{stem}.{code}", f"{stem}-{code}", f"{code}.{stem}"))
     email += "@" + rng.choice(("mailbox.test", "shopmail.test", "customer.test"))
+    if profile == "v8":
+        # Development diagnostic found sensitivity to email spelling. Mix
+        # hash, short numeric and longer numeric local parts and domains.
+        # No held-out address or reserved split prefix is used.
+        numeric = int(digest[10:18], 16)
+        email_variants = (
+            email,
+            f"{stem}.{numeric % 10000:04d}@example.test",
+            f"customer.{numeric % 10000:04d}@example.test",
+            f"member-{numeric % 1000000:06d}@mailbox.test",
+            f"{numeric % 10000:04d}.{stem}@shopmail.test",
+            f"client{numeric % 100000:05d}@customer.test",
+        )
+        email = email_variants[int(digest[-8:], 16) % len(email_variants)]
     old_products = task.initial_state["products"]
     brand = rng.choice(("Orbit", "Lumen", "Quartz", "Willow", "Atlas", "Nova"))
     replacements = {
@@ -78,7 +96,7 @@ def diversify_training_task(task: AgentTask, *, seed: int = 45) -> AgentTask:
     )
     return replace(
         task,
-        task_id=f"{task.task_id}-diverse",
+        task_id=f"{task.task_id}-diverse" + ("-v8" if profile == "v8" else ""),
         prompt=prompt,
         initial_state=transform(task.initial_state),
         expert_plan=tuple(transform(task.expert_plan)),

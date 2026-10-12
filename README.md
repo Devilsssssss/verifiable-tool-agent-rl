@@ -44,7 +44,7 @@ task outcome + policy compliance + valid tool-call rate + correct-prefix progres
 
 ## 数据与审计
 
-固定种子生成 `300/60/120` 条训练、验证和测试任务。三个划分使用不同的实体和提示模板；同一实体不会跨划分出现。`scripts/audit_tasks.py` 会重放所有专家轨迹并检查重复、ID 泄漏、跨划分实体重叠、空操作和直接捷径。
+固定种子生成 `300/60/120` 条训练、验证和测试任务。三个划分使用不同的 ID、邮箱、商品名称和提示模板；用户显示姓名不在实体重叠审计范围内。`scripts/audit_tasks.py` 会重放所有专家轨迹并检查重复、ID 泄漏、跨划分实体重叠、空操作和直接捷径。
 
 当前审计结果：
 
@@ -113,6 +113,9 @@ v1 的 35% 是旧版全轨迹训练的探索性结果，不能归因于“正确
 | v4，相同 600 视图 / 1 epoch / seed 45，修复训练格式 | validation-20 | 0/20 | 20/20 |
 | 同一 v4，在训练任务上的诊断 | train-10 | 10/10 | 未单独统计 |
 | v5，增强训练实体与三种问法，600 视图 / 1 epoch / seed 45 | validation-20 | 0/20 | 20/20 |
+| v6，增加 300 首调用视图，900 视图 / 1 epoch / seed 45 | validation-20 | 0/20 | 20/20 |
+| v7，定向补充首调用问法，900 视图 / 1 epoch / seed 45 | validation-20 | 0/20 | 20/20 |
+| v8，混合训练邮箱结构，900 视图 / 1 epoch / seed 45 | validation-20 | 0/20 | 20/20 |
 
 v4 会把 `For account` 一起复制进邮箱。这支持继续检查训练覆盖，而不能把格式审计通过当成行为能力改善。训练任务诊断不是泛化成绩。
 
@@ -122,7 +125,19 @@ v4 会把 `For account` 一起复制进邮箱。这支持继续检查训练覆�
 
 `scripts/probe_email.py` 固定 10 个验证任务的邮箱、商品，只改变用户问法，单独测首个 `lookup_user` 调用。v5 在原问法下为 0/10，三组已见训练问法分别为 10/10。该诊断支持措辞敏感性，不能当成完整任务成功率。结果见 `artifacts/qwen3-sft-repair-v5-email-probe.summary.json`。
 
-`scripts/create_lookup_curriculum.py` 因此增加 300 条训练用首调用监督，使用 12 种邮箱句式，保留原有 300 正常和 300 修复视图。v6 共 900 个视图，仍只有 300 个独立业务任务；这不是等预算的单变量实验。新增样本不包含验证或确认集任务，邮箱查询逐条重放核验。
+`scripts/create_lookup_curriculum.py` 因此增加 300 条训练用首调用监督，使用 12 种邮箱句式，保留原有 300 正常和 300 修复视图。v6 共 900 个视图，仍只有 300 个独立业务任务；这不是等预算的单变量实验。新增样本不包含验证或确认集任务，邮箱查询逐条重放核验。v6 的 900 个视图掩码审计通过，4200 个助手生成位置与 GRPO 原生模板逐 token 一致，但 validation-20 仍为 0/20。
+
+v7 的训练课程定向补充四种 `For account + 邮箱` 句式（训练实体及请求），视图总数仍为 900。通用前缀与验证问法重叠，因此后续验证提升只能作为开发诊断；未见措辞的结论需要另用冻结确认集。
+
+v7 的交叉首调用诊断使用 5 条开发验证任务：原问法配训练邮箱为 5/5；首调用训练问法配验证邮箱为 0/5；原问法配验证邮箱为 0/5；原始首调用训练样本为 5/5。三组先前的完整训练问法配验证邮箱则各为 5/5。结果支持邮箱拼写与问法交互，不能仅归因于问法，也不是完整任务成功率。商品问法未做完全交叉控制。
+
+v8 将训练邮箱混合成短数字、长数字和哈希结构，覆盖 `example.test` 及三个训练域名，不使用开发或确认集的邮箱、保留前缀。保持 300 个独立任务及 900 个视图，从同一原始模型训练 1 epoch / seed 45；数据结构选择来自开发诊断，因此验证结果仍属探索性结果。
+
+v8 的 900 视图掩码/格式审计全部通过，600 条跨划分专家审计通过，但 validation-20 仍为 0/20、错误邮箱 20/20；交叉首调用探针的七组计数与 v7 相同。严格评分与原始轨迹重放一致，未据此启动新 RL。当前下一阶段是系统交叉覆盖问法与邮箱结构；详见 [失败复盘与下一轮设计](docs/sft_failure_review.md)。
+
+旧两组 30 步 GRPO 日志的奖励审计显示：稀疏奖励 29/30 步、过程奖励 28/30 步的组内奖励标准差为零。均值奖励很高也可能只是重复相同轨迹。`scripts/audit_training_logs.py` 保存原日志哈希和原生统计；`scripts/probe_reward_groups.py` 在训练任务上采样，预检两种奖励是否具有组内差异。推理预检与原生 GRPO 工具循环不同，不能互相替代。
+
+`scripts/compare_runs.py` 对保存的逐条轨迹做配对比较，拒绝不同数据哈希、任务集合、生成预算、格式或评分口径的结果；任务级 bootstrap 不等于多训练种子的不确定性。
 
 ## 复现
 
@@ -205,6 +220,42 @@ python scripts/train_sft.py \
   --output-dir outputs/qwen3-1.7b-tool-sft-repair-v6 \
   --epochs 1 --learning-rate 2e-4 \
   --batch-size 1 --gradient-accumulation 8 --seed 45
+```
+
+复现 v7 定向补充时，先生成单独目录以保留 v6 的数据：
+
+```bash
+python scripts/create_lookup_curriculum.py --profile v7 \
+  --output-dir data/curriculum-v7 \
+  --summary artifacts/lookup-curriculum-v7.summary.json
+# 使用上面的 v6 训练命令，并修改两个参数：
+# --train-extra data/curriculum-v7/sft_repair_lookup_train.jsonl
+# --output-dir outputs/qwen3-1.7b-tool-sft-repair-v7
+```
+
+复现 v8 邮箱结构覆盖：
+
+```bash
+python scripts/augment_training.py --profile v8 --output-dir data/diverse-v8 \
+  --confirmation data/confirmation/tasks_test.jsonl \
+  --summary artifacts/diverse-v8-training-audit.summary.json
+python scripts/create_lookup_curriculum.py --profile v7 --data-dir data/diverse-v8 \
+  --summary artifacts/lookup-curriculum-v8.summary.json
+python scripts/audit_sft_masks.py --model-id "$MODEL_DIR" \
+  --data data/diverse-v8/sft_train.jsonl data/diverse-v8/sft_repair_lookup_train.jsonl \
+  --output artifacts/qwen3-sft-repair-v8-mask-audit.summary.json
+python scripts/train_sft.py --model-id "$MODEL_DIR" \
+  --train data/diverse-v8/sft_train.jsonl \
+  --train-extra data/diverse-v8/sft_repair_lookup_train.jsonl \
+  --validation data/generated/sft_validation.jsonl \
+  --validation-extra data/generated/sft_repair_validation.jsonl \
+  --output-dir outputs/qwen3-1.7b-tool-sft-repair-v8 \
+  --epochs 1 --learning-rate 2e-4 --batch-size 1 --gradient-accumulation 8 --seed 45
+python scripts/probe_email.py --model-id "$MODEL_DIR" \
+  --adapter outputs/qwen3-1.7b-tool-sft-repair-v7 \
+  --tasks data/generated/tasks_validation.jsonl --limit 5 \
+  --lookup-data data/curriculum-v7/sft_lookup_train.jsonl \
+  --output artifacts/qwen3-sft-repair-v7-lookup-controls.jsonl
 ```
 
 分别从同一个 SFT adapter 运行两组 GRPO：

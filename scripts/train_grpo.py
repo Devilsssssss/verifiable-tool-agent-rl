@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
+from importlib.metadata import version
 from pathlib import Path
 
 os.environ.setdefault("USE_TF", "0")
@@ -35,6 +37,8 @@ def main() -> int:
     parser.add_argument("--max-train-samples", type=int)
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
+    if args.max_steps < 1 or args.num_generations < 2:
+        raise ValueError("require positive max_steps and at least two generations")
 
     import torch
     from datasets import Dataset
@@ -97,8 +101,9 @@ def main() -> int:
         processing_class=tokenizer,
         environment_factory=RetailToolEnvironment,
     )
-    trainer.train()
+    result = trainer.train()
     trainer.save_model(str(args.output_dir))
+    trainer.state.save_to_json(str(args.output_dir / "trainer_state.json"))
     tokenizer.save_pretrained(args.output_dir)
     manifest = {
         "stage": "grpo",
@@ -115,6 +120,25 @@ def main() -> int:
         "top_p": args.top_p,
         "seed": args.seed,
         "input_format": INPUT_FORMAT,
+        "train_path": str(train_path),
+        "train_sha256": hashlib.sha256(train_path.read_bytes()).hexdigest(),
+        "sft_adapter_sha256": {
+            path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in sorted(args.sft_adapter.glob("adapter*"))
+            if path.is_file()
+        },
+        "optimizer_steps": trainer.state.global_step,
+        "train_metrics": result.metrics,
+        "gradient_accumulation": 4,
+        "max_tool_calling_iterations": 8,
+        "beta": 0.02,
+        "loss_type": "dapo",
+        "scale_rewards": "group",
+        "mask_truncated_completions": True,
+        "libraries": {
+            name: version(name)
+            for name in ("torch", "transformers", "trl", "datasets", "peft", "pyarrow")
+        },
     }
     (args.output_dir / "training_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

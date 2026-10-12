@@ -1,0 +1,54 @@
+{
+  "tasks": 600,
+  "split_counts": {
+    "confirmation": 120,
+    "test": 120,
+    "train": 300,
+    "validation": 60
+  },
+  "family_counts": {
+    "cancel_processing": 120,
+    "cancel_shipped": 120,
+    "exchange_cheaper": 120,
+    "return_eligible": 120,
+    "return_expired": 120
+  },
+  "expert_successes": 600,
+  "noop_successes": 0,
+  "direct_shortcut_successes": 0,
+  "mean_expert_shaped_reward": 1.4000000000000001,
+  "entity_overlap_across_splits": 0,
+  "task_sha256": "4e351cd2258d7135ac03656876f9d70622d2c893cb85eaece6d08351d40cc4a8",
+  "status": "pass",
+  "augmentation_seed": 45,
+  "augmentation_profile": "v8",
+  "email_domain_counts": {
+    "customer.test": 65,
+    "shopmail.test": 67,
+    "example.test": 97,
+    "mailbox.test": 71
+  },
+  "source_sha256": "d122f65101e6ffb9ddb4c386c520a8d555e9e9b80218771314f40b8fbd38cfaf",
+  "source_tasks": 300,
+  "independent_training_tasks": 300,
+  "training_views": 600,
+  "training_template_counts": {
+    "train-cancel_processing-diverse-1": 16,
+    "train-cancel_shipped-diverse-1": 24,
+    "train-exchange_cheaper-diverse-1": 22,
+    "train-return_eligible-diverse-1": 28,
+    "train-return_expired-diverse-1": 20,
+    "train-exchange_cheaper-diverse-2": 21,
+    "train-return_expired-diverse-0": 24,
+    "train-cancel_processing-diverse-0": 18,
+    "train-cancel_shipped-diverse-0": 13,
+    "train-cancel_processing-diverse-2": 26,
+    "train-cancel_shipped-diverse-2": 23,
+    "train-return_expired-diverse-2": 16,
+    "train-exchange_cheaper-diverse-0": 17,
+    "train-return_eligible-diverse-0": 16,
+    "train-return_eligible-diverse-2": 16
+  },
+  "held_out_modified": false,
+  "confirmation_audited": "data/confirmation/tasks_test.jsonl"
+}

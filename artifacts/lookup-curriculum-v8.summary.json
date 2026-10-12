@@ -1,0 +1,22 @@
+{
+  "seed": 45,
+  "profile": "v7",
+  "independent_training_tasks": 300,
+  "normal_views": 300,
+  "repair_views": 300,
+  "lookup_views": 300,
+  "total_views": 900,
+  "lookup_replay_verified": 300,
+  "frame_counts": {
+    "3": 75,
+    "1": 69,
+    "0": 81,
+    "2": 75
+  },
+  "source_sha256": "e3684c5c2d24371d6dd65ccbdc53b92dd30a36d217f591e3c9108773331ef48f",
+  "extra_sha256": "9e93fe2b57e4db3cf8d2f289c425142ef213568cc2e7b73f1c0ef58321f8cf4b",
+  "development_driven": true,
+  "shares_generic_validation_email_frame": true,
+  "held_out_modified": false,
+  "scope": "First-call supervision; does not add independent business tasks."
+}

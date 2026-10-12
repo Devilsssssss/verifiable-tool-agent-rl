@@ -1,0 +1,57 @@
+import importlib.util
+import json
+from pathlib import Path
+
+import pytest
+
+from toolrl.io import write_jsonl
+
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/compare_runs.py"
+SPEC = importlib.util.spec_from_file_location("compare_runs", SCRIPT)
+assert SPEC and SPEC.loader
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+
+
+def save_run(path: Path, outcomes: list[bool], *, budget: int = 512) -> None:
+    write_jsonl(
+        path,
+        (
+            {"task_id": str(i), "family": "cancel_processing", "success": success}
+            for i, success in enumerate(outcomes)
+        ),
+    )
+    path.with_suffix(".summary.json").write_text(
+        json.dumps(
+            {
+                "tasks_sha256": "frozen",
+                "limit": len(outcomes),
+                "seed": 42,
+                "temperature": 0,
+                "max_new_tokens": budget,
+                "input_format": "canonical-v4",
+                "scoring_protocol": "strict",
+                "overall": {"tasks": len(outcomes), "task_success": sum(outcomes) / len(outcomes)},
+            }
+        )
+    )
+
+
+def test_paired_comparison_counts_gains_and_losses(tmp_path: Path) -> None:
+    baseline, candidate = tmp_path / "before.jsonl", tmp_path / "after.jsonl"
+    save_run(baseline, [True, False, False])
+    save_run(candidate, [False, True, True])
+    report = MODULE.compare_pair(baseline, candidate)
+    assert report["gained_tasks"] == 2
+    assert report["lost_tasks"] == 1
+    assert report["strict_success_difference"] == pytest.approx(1 / 3)
+    assert report["paired_bootstrap_95_interval"][0] <= 1 / 3
+    assert report["paired_bootstrap_95_interval"][1] >= 1 / 3
+
+
+def test_paired_comparison_rejects_changed_generation_budget(tmp_path: Path) -> None:
+    baseline, candidate = tmp_path / "before.jsonl", tmp_path / "after.jsonl"
+    save_run(baseline, [False, False])
+    save_run(candidate, [True, True], budget=1024)
+    with pytest.raises(ValueError, match="max_new_tokens"):
+        MODULE.compare_pair(baseline, candidate)

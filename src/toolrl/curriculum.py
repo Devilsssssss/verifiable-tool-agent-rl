@@ -22,10 +22,12 @@ EMAIL_FRAMES = (
 )
 
 
-def lookup_training_row(task: AgentTask, *, seed: int = 45) -> dict:
+def lookup_training_row(task: AgentTask, *, seed: int = 45, profile: str = "v6") -> dict:
     """Supervise just the first lookup, using entities from a training task."""
     if task.split != "train":
         raise ValueError("lookup curriculum only accepts training tasks")
+    if profile not in {"v6", "v7"}:
+        raise ValueError("unknown lookup curriculum profile")
     email = task.initial_state["users"][0]["email"]
     products = task.initial_state["products"]
     old_name, new_name = products[0]["name"], products[1]["name"]
@@ -36,8 +38,18 @@ def lookup_training_row(task: AgentTask, *, seed: int = 45) -> dict:
     else:
         request = f"Please replace {old_name} with {new_name} and refund the difference."
     digest = hashlib.sha256(f"lookup:{seed}:{task.task_id}".encode()).hexdigest()
-    frame = int(digest, 16) % len(EMAIL_FRAMES)
-    prompt = EMAIL_FRAMES[frame].format(email=email, request=request)
+    frames = EMAIL_FRAMES
+    if profile == "v7":
+        # Targeted backfill after development validation. The generic phrase
+        # overlaps validation and must not be called unseen wording any longer.
+        frames = (
+            "For account {email}, please help with this request: {request}",
+            "For account {email}: {request}",
+            "For account {email}\nRequest: {request}",
+            "For account {email} - {request}",
+        )
+    frame = int(digest, 16) % len(frames)
+    prompt = frames[frame].format(email=email, request=request)
     messages = conversation_prompt(prompt)
     messages.append(
         {
@@ -58,4 +70,5 @@ def lookup_training_row(task: AgentTask, *, seed: int = 45) -> dict:
         "split": "train",
         "messages": messages,
         "lookup_frame": frame,
+        "lookup_profile": profile,
     }
