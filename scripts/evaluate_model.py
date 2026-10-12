@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
+from toolrl.diagnostics import ExplicitEmailPrompt
 from toolrl.formatting import INPUT_FORMAT
 from toolrl.io import load_tasks, write_jsonl
 from toolrl.metrics import summarize_reports
@@ -33,6 +34,12 @@ def main() -> int:
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--input-format", choices=(INPUT_FORMAT, "legacy-v3"), default=INPUT_FORMAT)
+    parser.add_argument(
+        "--input-intervention",
+        choices=("original", "explicit-email-field-v1", "explicit-email-field-v2"),
+        default="original",
+        help="Development-only prompt intervention; does not change model outputs or tools.",
+    )
     args = parser.parse_args()
 
     import torch
@@ -61,11 +68,17 @@ def main() -> int:
         temperature=args.temperature,
         input_format=args.input_format,
     )
+    if args.input_intervention == "explicit-email-field-v1":
+        policy = ExplicitEmailPrompt(policy, variant="v1")
+    elif args.input_intervention == "explicit-email-field-v2":
+        policy = ExplicitEmailPrompt(policy, variant="v2")
     records = []
     partial_path = args.output.with_suffix(".partial.jsonl")
     for index, task in enumerate(tasks, start=1):
         record = run_episode(task, policy)
         record["run_name"] = args.run_name
+        if args.input_intervention != "original":
+            record["input_intervention"] = args.input_intervention
         records.append(record)
         # A failed/interrupted run retains clearly labelled partial trajectories.
         # Only a finished run writes the requested output and its summary.
@@ -91,6 +104,7 @@ def main() -> int:
         "temperature": args.temperature,
         "max_new_tokens": args.max_new_tokens,
         "input_format": args.input_format,
+        "input_intervention": args.input_intervention,
         "tasks_path": str(args.tasks),
         "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
         "limit": args.limit,

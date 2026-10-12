@@ -136,3 +136,26 @@ python scripts/audit_rollouts.py --tasks data/generated/tasks_validation.jsonl \
   --rollouts artifacts/v8-explicit-email-field-20.jsonl \
   --output artifacts/v8-explicit-email-field-20-replay.summary.json
 ```
+
+正式扩测可使用 `evaluate_model.py --input-intervention explicit-email-field-v1`。
+该选项同时支持不加载 adapter 的基础模型和 v8 adapter；比较时必须保持相同的
+输入干预、任务文件、seed、温度和生成预算。字段协议的结果不能与原始提示协议
+直接做 SFT 增益比较。
+
+## 字段协议的 validation-60 对照（2026-10-12）
+
+在同一 `validation-60`、seed 42、greedy、512 新 token 和 `canonical-v4` 下，
+只比较显式邮箱字段协议内的基座模型与 v8 adapter：
+
+| 模型 | 严格成功 | 五族 | 轨迹重放 | 错误邮箱 |
+| --- | ---: | ---: | ---: | ---: |
+| 基座 Qwen3-1.7B | 0/60 | 各0/12 | 60/60一致 | 0 |
+| v8 adapter | 60/60 | 各12/12 | 60/60一致 | 0 |
+
+配对比较为60条全增益、无损失，探索性任务 bootstrap 区间为 `[1.0, 1.0]`。
+这只能说明在这个**固定的新输入协议**和当前开发验证集上，v8 adapter 比基座
+多完成了任务；不等价于跨训练种子或新分布的因果结论。原始提示协议下 v8
+仍为0/20，因此不能把字段协议下的60/60改写为原协议的SFT增益。
+
+为检查字段位置，v8 将字段放到完整请求之后，在 validation-20 上仍为20/20；
+但这不是新的独立训练或泛化集。完整结果保存在 `artifacts/`。

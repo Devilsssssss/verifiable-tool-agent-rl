@@ -34,8 +34,18 @@ def compare_pair(baseline: Path, candidate: Path, *, seed: int = 42) -> dict:
     runs = [read_jsonl(path) for path in (baseline, candidate)]
     if any(row.get("oracle_first_lookup", False) for rows in runs for row in rows):
         raise ValueError("oracle-assisted diagnostics cannot enter unaided model comparisons")
-    if any(row.get("input_intervention", "original") != "original" for rows in runs for row in rows):
-        raise ValueError("input interventions require a separate comparison protocol")
+    interventions = [
+        summary.get("input_intervention", "original") for summary in summaries
+    ]
+    if interventions[0] != interventions[1]:
+        raise ValueError("paired comparison requires identical input interventions")
+    if any(
+        row.get("input_intervention", "original") != intervention
+        for rows in runs
+        for row in rows
+        for intervention in [interventions[0]]
+    ):
+        raise ValueError("rollout input intervention does not match its summary")
     indexed = [{row["task_id"]: row for row in rows} for rows in runs]
     if any(len(index) != len(rows) for index, rows in zip(indexed, runs, strict=True)):
         raise ValueError("duplicate task IDs in rollouts")
@@ -62,7 +72,10 @@ def compare_pair(baseline: Path, candidate: Path, *, seed: int = 42) -> dict:
         "baseline": str(baseline),
         "candidate": str(candidate),
         "paired_tasks": len(pairs),
-        "protocol": {key: summaries[0][key] for key in PROTOCOL_KEYS},
+        "protocol": {
+            **{key: summaries[0][key] for key in PROTOCOL_KEYS},
+            "input_intervention": interventions[0],
+        },
         "baseline_successes": sum(before for before, _ in pairs),
         "candidate_successes": sum(after for _, after in pairs),
         "gained_tasks": sum(not before and after for before, after in pairs),
@@ -74,7 +87,8 @@ def compare_pair(baseline: Path, candidate: Path, *, seed: int = 42) -> dict:
         "scope": (
             "Exploratory paired task bootstrap; tasks share synthetic templates. "
             "Does not quantify model-training seed variability or establish causality. "
-            "A degenerate all-zero interval is not evidence of population equivalence."
+            "A degenerate all-zero interval is not evidence of population equivalence. "
+            "Comparisons with an input intervention are valid only within that same intervention."
         ),
     }
 

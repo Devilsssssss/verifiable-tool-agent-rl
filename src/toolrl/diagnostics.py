@@ -87,8 +87,11 @@ class OracleFirstLookup:
 class ExplicitEmailPrompt:
     """Input-format diagnostic: expose only the email already written by the user."""
 
-    def __init__(self, policy: ResponsePolicy) -> None:
+    def __init__(self, policy: ResponsePolicy, *, variant: str = "v1") -> None:
+        if variant not in {"v1", "v2"}:
+            raise ValueError(f"unsupported explicit email variant: {variant}")
         self.policy = policy
+        self.variant = variant
 
     def __call__(self, messages, tools) -> dict[str, Any]:
         changed = deepcopy(messages)
@@ -96,5 +99,8 @@ class ExplicitEmailPrompt:
         emails = re.findall(r"[A-Za-z0-9_.+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+", request)
         if len(emails) != 1:
             raise ValueError("explicit-field diagnostic requires one email visible in user text")
-        changed[1]["content"] = f"Customer email: {emails[0]}\nRequest: {request}"
+        if self.variant == "v1":
+            changed[1]["content"] = f"Customer email: {emails[0]}\nRequest: {request}"
+        else:
+            changed[1]["content"] = f"Request: {request}\nCustomer email: {emails[0]}"
         return self.policy(changed, tools)

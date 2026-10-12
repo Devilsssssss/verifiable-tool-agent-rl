@@ -93,6 +93,10 @@ def test_email_field_uses_user_text_without_inventing_calls_or_mutating_history(
     assert observed[0][1]["content"] == (
         "Customer email: a.0001@example.test\nRequest: " + history[1]["content"]
     )
+    assert ExplicitEmailPrompt(policy, variant="v2")(history, []) is final
+    assert observed[1][1]["content"] == (
+        "Request: " + history[1]["content"] + "\nCustomer email: a.0001@example.test"
+    )
     assert history[1]["content"].startswith("For account")
     with pytest.raises(ValueError, match="one email"):
         ExplicitEmailPrompt(policy)(history[:1] + [{"role": "user", "content": "No email."}], [])
