@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from toolrl.expert import grpo_row, training_row
+from toolrl.expert import grpo_row, repair_training_row, training_row
 from toolrl.generator import generate_tasks
 from toolrl.io import write_jsonl
 
@@ -43,6 +43,10 @@ def main() -> int:
             write_jsonl(
                 args.output_dir / f"sft_{split}.jsonl",
                 (training_row(task) for task in split_tasks),
+            )
+            write_jsonl(
+                args.output_dir / f"sft_repair_{split}.jsonl",
+                (repair_training_row(task) for task in split_tasks),
             )
     print(json.dumps({"seed": args.seed, "split_counts": counts, "output": str(args.output_dir)}))
     return 0

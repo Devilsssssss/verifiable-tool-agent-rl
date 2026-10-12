@@ -1,0 +1,92 @@
+{
+  "rollouts": "artifacts/qwen3-1.7b-tool-sft-repair-v1-test-120.jsonl",
+  "tasks": "data/generated/tasks_test.jsonl",
+  "replay_verified": 120,
+  "original_scores_unchanged": true,
+  "wrong_email_tasks": 0,
+  "definition": {
+    "task_success": "Original strict success: correct terminal state and no violations.",
+    "terminal_goal_completion": "Correct terminal state, independent of prior violations.",
+    "format_recovery_rate": "Correct terminal state with only invalid_tool_call violations, divided by episodes containing invalid_tool_call. Other policy violations remain disqualifying."
+  },
+  "overall": {
+    "tasks": 120,
+    "task_success": 0.35,
+    "policy_compliance": 0.35833333333333334,
+    "mean_valid_tool_rate": 0.6185879629629629,
+    "mean_steps": 7.95,
+    "mean_progress": 0.6749404761904763,
+    "mean_shaped_reward": 0.19766832010582022,
+    "terminal_goal_completion": 0.4166666666666667,
+    "format_error_tasks": 74,
+    "format_recovery_successes": 4,
+    "format_recovery_rate": 0.05405405405405406
+  },
+  "by_family": {
+    "cancel_processing": {
+      "tasks": 24,
+      "task_success": 1.0,
+      "policy_compliance": 1.0,
+      "mean_valid_tool_rate": 1.0,
+      "mean_steps": 5.0,
+      "mean_progress": 1.0,
+      "mean_shaped_reward": 1.4000000000000001,
+      "terminal_goal_completion": 1.0,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null
+    },
+    "cancel_shipped": {
+      "tasks": 24,
+      "task_success": 0.20833333333333334,
+      "policy_compliance": 0.20833333333333334,
+      "mean_valid_tool_rate": 0.5499999999999999,
+      "mean_steps": 7.708333333333333,
+      "mean_progress": 0.75,
+      "mean_shaped_reward": -0.011666666666666546,
+      "terminal_goal_completion": 0.4166666666666667,
+      "format_error_tasks": 18,
+      "format_recovery_successes": 4,
+      "format_recovery_rate": 0.2222222222222222
+    },
+    "exchange_cheaper": {
+      "tasks": 24,
+      "task_success": 0.5416666666666666,
+      "policy_compliance": 0.5833333333333334,
+      "mean_valid_tool_rate": 0.8512731481481483,
+      "mean_steps": 7.041666666666667,
+      "mean_progress": 0.7142857142857143,
+      "mean_shaped_reward": 0.566674933862434,
+      "terminal_goal_completion": 0.6666666666666666,
+      "format_error_tasks": 9,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": 0.0
+    },
+    "return_eligible": {
+      "tasks": 24,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.4000000000000001,
+      "mean_steps": 10.0,
+      "mean_progress": 0.4000000000000001,
+      "mean_shaped_reward": -0.49999999999999983,
+      "terminal_goal_completion": 0.0,
+      "format_error_tasks": 24,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": 0.0
+    },
+    "return_expired": {
+      "tasks": 24,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.2916666666666667,
+      "mean_steps": 10.0,
+      "mean_progress": 0.5104166666666666,
+      "mean_shaped_reward": -0.46666666666666656,
+      "terminal_goal_completion": 0.0,
+      "format_error_tasks": 23,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": 0.0
+    }
+  }
+}

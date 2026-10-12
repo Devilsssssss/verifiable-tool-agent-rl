@@ -20,7 +20,9 @@ def _drop_null_tool_slots(method):
 
     @wraps(method)
     def wrapped(self, *args: Any, **kwargs: Any) -> str:
-        return method(self, *args, **{key: value for key, value in kwargs.items() if value is not None})
+        return method(
+            self, *args, **{key: value for key, value in kwargs.items() if value is not None}
+        )
 
     wrapped.__signature__ = inspect.signature(method)  # type: ignore[attr-defined]
     return wrapped
@@ -213,9 +215,7 @@ class RetailToolEnvironment:
         args = {"product_id": product_id, "quantity": quantity}
         if error := self._preflight("check_inventory", args):
             return error
-        row = self._db.execute(
-            "SELECT stock FROM products WHERE id = ?", (product_id,)
-        ).fetchone()
+        row = self._db.execute("SELECT stock FROM products WHERE id = ?", (product_id,)).fetchone()
         if row is None or quantity <= 0:
             return self._finish(
                 "check_inventory", args, False, {"error": "invalid_product_or_quantity"}
@@ -443,9 +443,7 @@ class RetailToolEnvironment:
             "INSERT INTO refunds(order_id, amount_cents, payment_method) VALUES (?, ?, ?)",
             (order_id, amount_cents, payment_method),
         )
-        self._db.execute(
-            "UPDATE orders SET pending_refund_cents = 0 WHERE id = ?", (order_id,)
-        )
+        self._db.execute("UPDATE orders SET pending_refund_cents = 0 WHERE id = ?", (order_id,))
         self._db.commit()
         return self._finish(
             "issue_refund",
@@ -472,9 +470,7 @@ class RetailToolEnvironment:
             return self._policy_error("escalate_to_human", args, "inspect_order_before_escalation")
         self._db.execute("INSERT INTO escalations(reason) VALUES (?)", (reason,))
         self._db.commit()
-        return self._finish(
-            "escalate_to_human", args, True, {"status": "escalated"}, mutated=True
-        )
+        return self._finish("escalate_to_human", args, True, {"status": "escalated"}, mutated=True)
 
     def get_reward(self) -> float:
         """Return the configured terminal reward for the completed rollout."""
@@ -490,6 +486,8 @@ class RetailToolEnvironment:
         if self._connection is None:
             return {
                 "success": False,
+                "terminal_goal_satisfied": False,
+                "format_recovery_success": False,
                 "policy_compliant": True,
                 "violations": [],
                 "steps": 0,
@@ -500,6 +498,12 @@ class RetailToolEnvironment:
             }
         success = self._goal_satisfied()
         violations = [step["violation"] for step in self._trace if step["violation"]]
+        terminal_goal = self._terminal_goal_satisfied()
+        format_recovery = bool(
+            terminal_goal
+            and violations
+            and all(violation == "invalid_tool_call" for violation in violations)
+        )
         successful_calls = sum(bool(step["success"]) for step in self._trace)
         valid_rate = successful_calls / len(self._trace) if self._trace else 0.0
         compliant = not violations
@@ -517,6 +521,8 @@ class RetailToolEnvironment:
         )
         return {
             "success": success,
+            "terminal_goal_satisfied": terminal_goal,
+            "format_recovery_success": format_recovery,
             "policy_compliant": compliant,
             "violations": violations,
             "steps": len(self._trace),
@@ -631,9 +637,7 @@ class RetailToolEnvironment:
     def _policy_error(self, name: str, args: dict[str, Any], code: str) -> str:
         return self._finish(name, args, False, {"error": code}, violation=code)
 
-    def _record_external_failure(
-        self, name: str, args: dict[str, Any], error: str
-    ) -> str:
+    def _record_external_failure(self, name: str, args: dict[str, Any], error: str) -> str:
         return self._finish(
             name,
             args,
@@ -667,6 +671,10 @@ class RetailToolEnvironment:
     def _goal_satisfied(self) -> bool:
         if any(step["violation"] for step in self._trace):
             return False
+        return self._terminal_goal_satisfied()
+
+    def _terminal_goal_satisfied(self) -> bool:
+        """Check database outcome only; strict success still rejects all violations."""
         kind = self._goal.get("kind")
         order_id = int(self._goal.get("order_id", -1))
         if kind == "cancel_refund":
@@ -726,7 +734,13 @@ class RetailToolEnvironment:
 
     def _correct_prefix_length(self) -> int:
         expected = {
-            "cancel_refund": ["lookup_user", "list_orders", "get_order", "cancel_order", "issue_refund"],
+            "cancel_refund": [
+                "lookup_user",
+                "list_orders",
+                "get_order",
+                "cancel_order",
+                "issue_refund",
+            ],
             "exchange_refund": [
                 "lookup_user",
                 "list_orders",

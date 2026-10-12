@@ -1,0 +1,63 @@
+{
+  "run_name": "qwen3-1.7b-grpo-shaped-formal-v1-validation-20",
+  "model_id": "models/Qwen3-1.7B",
+  "adapter": "outputs/qwen3-1.7b-grpo-shaped-formal-v1",
+  "seed": 42,
+  "temperature": 0.0,
+  "overall": {
+    "tasks": 20,
+    "task_success": 0.0,
+    "policy_compliance": 0.0,
+    "mean_valid_tool_rate": 0.0,
+    "mean_steps": 9.6,
+    "mean_progress": 0.0,
+    "mean_shaped_reward": -0.7
+  },
+  "by_family": {
+    "cancel_processing": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.0,
+      "mean_steps": 9.0,
+      "mean_progress": 0.0,
+      "mean_shaped_reward": -0.7
+    },
+    "cancel_shipped": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.0,
+      "mean_steps": 8.75,
+      "mean_progress": 0.0,
+      "mean_shaped_reward": -0.7
+    },
+    "exchange_cheaper": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.0,
+      "mean_steps": 11.0,
+      "mean_progress": 0.0,
+      "mean_shaped_reward": -0.7
+    },
+    "return_eligible": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.0,
+      "mean_steps": 9.5,
+      "mean_progress": 0.0,
+      "mean_shaped_reward": -0.7
+    },
+    "return_expired": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.0,
+      "mean_steps": 9.75,
+      "mean_progress": 0.0,
+      "mean_shaped_reward": -0.7
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "run_name": "qwen3-1.7b-tool-sft-repair-v3-test-20",
+  "model_id": "models/Qwen3-1.7B",
+  "adapter": "outputs/qwen3-1.7b-tool-sft-repair-v3",
+  "seed": 42,
+  "temperature": 0.0,
+  "overall": {
+    "tasks": 20,
+    "task_success": 0.0,
+    "policy_compliance": 0.0,
+    "mean_valid_tool_rate": 0.6842857142857144,
+    "mean_steps": 6.7,
+    "mean_progress": 0.7057142857142857,
+    "mean_shaped_reward": -0.34928571428571414
+  },
+  "by_family": {
+    "cancel_processing": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.4,
+      "mean_steps": 10.0,
+      "mean_progress": 0.8,
+      "mean_shaped_reward": -0.33999999999999986
+    },
+    "cancel_shipped": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.8,
+      "mean_steps": 5.0,
+      "mean_progress": 0.75,
+      "mean_shaped_reward": -0.31999999999999984
+    },
+    "exchange_cheaper": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.8166666666666667,
+      "mean_steps": 5.5,
+      "mean_progress": 0.42857142857142855,
+      "mean_shaped_reward": -0.4469047619047618
+    },
+    "return_eligible": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.8333333333333334,
+      "mean_steps": 6.0,
+      "mean_progress": 0.8,
+      "mean_shaped_reward": -0.2966666666666665
+    },
+    "return_expired": {
+      "tasks": 4,
+      "task_success": 0.0,
+      "policy_compliance": 0.0,
+      "mean_valid_tool_rate": 0.5714285714285714,
+      "mean_steps": 7.0,
+      "mean_progress": 0.75,
+      "mean_shaped_reward": -0.34285714285714275
+    }
+  }
+}

@@ -8,7 +8,11 @@
       "mean_valid_tool_rate": 1.0,
       "mean_steps": 5.0,
       "mean_progress": 1.0,
-      "mean_shaped_reward": 1.4000000000000001
+      "mean_shaped_reward": 1.4000000000000001,
+      "terminal_goal_completion": 1.0,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null
     },
     "by_family": {
       "cancel_processing": {
@@ -18,7 +22,11 @@
         "mean_valid_tool_rate": 1.0,
         "mean_steps": 5.0,
         "mean_progress": 1.0,
-        "mean_shaped_reward": 1.4000000000000001
+        "mean_shaped_reward": 1.4000000000000001,
+        "terminal_goal_completion": 1.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "cancel_shipped": {
         "tasks": 24,
@@ -27,7 +35,11 @@
         "mean_valid_tool_rate": 1.0,
         "mean_steps": 4.0,
         "mean_progress": 1.0,
-        "mean_shaped_reward": 1.4000000000000001
+        "mean_shaped_reward": 1.4000000000000001,
+        "terminal_goal_completion": 1.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "exchange_cheaper": {
         "tasks": 24,
@@ -36,7 +48,11 @@
         "mean_valid_tool_rate": 1.0,
         "mean_steps": 7.0,
         "mean_progress": 1.0,
-        "mean_shaped_reward": 1.4000000000000001
+        "mean_shaped_reward": 1.4000000000000001,
+        "terminal_goal_completion": 1.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "return_eligible": {
         "tasks": 24,
@@ -45,7 +61,11 @@
         "mean_valid_tool_rate": 1.0,
         "mean_steps": 5.0,
         "mean_progress": 1.0,
-        "mean_shaped_reward": 1.4000000000000001
+        "mean_shaped_reward": 1.4000000000000001,
+        "terminal_goal_completion": 1.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "return_expired": {
         "tasks": 24,
@@ -54,7 +74,11 @@
         "mean_valid_tool_rate": 1.0,
         "mean_steps": 4.0,
         "mean_progress": 1.0,
-        "mean_shaped_reward": 1.4000000000000001
+        "mean_shaped_reward": 1.4000000000000001,
+        "terminal_goal_completion": 1.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       }
     }
   },
@@ -66,7 +90,11 @@
       "mean_valid_tool_rate": 0.0,
       "mean_steps": 0.0,
       "mean_progress": 0.0,
-      "mean_shaped_reward": -0.2
+      "mean_shaped_reward": -0.2,
+      "terminal_goal_completion": 0.0,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null
     },
     "by_family": {
       "cancel_processing": {
@@ -76,7 +104,11 @@
         "mean_valid_tool_rate": 0.0,
         "mean_steps": 0.0,
         "mean_progress": 0.0,
-        "mean_shaped_reward": -0.20000000000000004
+        "mean_shaped_reward": -0.20000000000000004,
+        "terminal_goal_completion": 0.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "cancel_shipped": {
         "tasks": 24,
@@ -85,7 +117,11 @@
         "mean_valid_tool_rate": 0.0,
         "mean_steps": 0.0,
         "mean_progress": 0.0,
-        "mean_shaped_reward": -0.20000000000000004
+        "mean_shaped_reward": -0.20000000000000004,
+        "terminal_goal_completion": 0.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "exchange_cheaper": {
         "tasks": 24,
@@ -94,7 +130,11 @@
         "mean_valid_tool_rate": 0.0,
         "mean_steps": 0.0,
         "mean_progress": 0.0,
-        "mean_shaped_reward": -0.20000000000000004
+        "mean_shaped_reward": -0.20000000000000004,
+        "terminal_goal_completion": 0.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "return_eligible": {
         "tasks": 24,
@@ -103,7 +143,11 @@
         "mean_valid_tool_rate": 0.0,
         "mean_steps": 0.0,
         "mean_progress": 0.0,
-        "mean_shaped_reward": -0.20000000000000004
+        "mean_shaped_reward": -0.20000000000000004,
+        "terminal_goal_completion": 0.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       },
       "return_expired": {
         "tasks": 24,
@@ -112,7 +156,11 @@
         "mean_valid_tool_rate": 0.0,
         "mean_steps": 0.0,
         "mean_progress": 0.0,
-        "mean_shaped_reward": -0.20000000000000004
+        "mean_shaped_reward": -0.20000000000000004,
+        "terminal_goal_completion": 0.0,
+        "format_error_tasks": 0,
+        "format_recovery_successes": 0,
+        "format_recovery_rate": null
       }
     }
   }

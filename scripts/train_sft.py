@@ -21,9 +21,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="LoRA SFT on verified expert tool trajectories")
     parser.add_argument("--model-id", default="Qwen/Qwen3-1.7B")
     parser.add_argument("--train", type=Path, default=ROOT / "data/generated/sft_train.jsonl")
+    parser.add_argument("--train-extra", type=Path)
     parser.add_argument(
         "--validation", type=Path, default=ROOT / "data/generated/sft_validation.jsonl"
     )
+    parser.add_argument("--validation-extra", type=Path)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "outputs/qwen3-1.7b-tool-sft")
     parser.add_argument("--epochs", type=float, default=2.0)
     parser.add_argument("--learning-rate", type=float, default=2e-4)
@@ -50,23 +52,38 @@ def main() -> int:
     tool_schemas = [get_json_schema(tool) for tool in tools]
 
     def as_conversations(rows: list[dict]) -> Dataset:
-        return Dataset.from_list(
-            [
-                {
-                    "task_id": row["task_id"],
-                    "family": row["family"],
-                    "messages": row["messages"],
-                    "tools": json.dumps(tool_schemas, sort_keys=True),
-                }
-                for row in rows
-            ]
-        )
+        examples = []
+        for row in rows:
+            example = {
+                "task_id": row["task_id"],
+                "family": row["family"],
+                "tools": json.dumps(tool_schemas, sort_keys=True),
+            }
+            if "messages" in row:
+                completion_start = int(row.get("completion_start", 2))
+                example["prompt"] = row["messages"][:completion_start]
+                example["completion"] = row["messages"][completion_start:]
+            else:
+                example["prompt"] = row["prompt"]
+                example["completion"] = row["completion"]
+            examples.append(example)
+        return Dataset.from_list(examples)
 
     train_rows = read_jsonl(args.train)
+    primary_train_samples = len(train_rows)
+    if args.train_extra is not None:
+        train_rows.extend(read_jsonl(args.train_extra))
     if args.max_train_samples is not None:
+        if args.max_train_samples <= 0:
+            raise ValueError("max_train_samples must be positive")
         train_rows = train_rows[: args.max_train_samples]
+        primary_train_samples = min(primary_train_samples, len(train_rows))
     train_dataset = as_conversations(train_rows)
-    eval_dataset = as_conversations(read_jsonl(args.validation))
+    validation_rows = read_jsonl(args.validation)
+    primary_validation_samples = len(validation_rows)
+    if args.validation_extra is not None:
+        validation_rows.extend(read_jsonl(args.validation_extra))
+    eval_dataset = as_conversations(validation_rows)
     config = SFTConfig(
         output_dir=str(args.output_dir),
         num_train_epochs=args.epochs,
@@ -76,6 +93,7 @@ def main() -> int:
         gradient_accumulation_steps=args.gradient_accumulation,
         max_length=args.max_length,
         assistant_only_loss=True,
+        completion_only_loss=True,
         packing=False,
         eval_strategy="epoch",
         save_strategy="epoch",
@@ -111,11 +129,18 @@ def main() -> int:
         "stage": "sft",
         "base_model": args.model_id,
         "train_samples": len(train_dataset),
+        "primary_train_samples": primary_train_samples,
+        "extra_train_samples": len(train_dataset) - primary_train_samples,
         "validation_samples": len(eval_dataset),
+        "primary_validation_samples": primary_validation_samples,
+        "extra_validation_samples": len(eval_dataset) - primary_validation_samples,
         "epochs": args.epochs,
         "learning_rate": args.learning_rate,
         "max_length": args.max_length,
         "seed": args.seed,
+        "assistant_only_loss": True,
+        "completion_only_loss": True,
+        "repair_prefix_supervised": False,
     }
     (args.output_dir / "training_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

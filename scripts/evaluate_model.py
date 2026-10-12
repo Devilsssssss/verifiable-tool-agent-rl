@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import random
@@ -81,6 +82,11 @@ def main() -> int:
         "adapter": str(args.adapter) if args.adapter else None,
         "seed": args.seed,
         "temperature": args.temperature,
+        "max_new_tokens": args.max_new_tokens,
+        "tasks_path": str(args.tasks),
+        "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
+        "limit": args.limit,
+        "scoring_protocol": "strict-v1-with-terminal-diagnostics",
         **summarize_reports(records),
     }
     summary_path = args.output.with_suffix(".summary.json")
