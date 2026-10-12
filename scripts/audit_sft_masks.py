@@ -12,6 +12,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from toolrl.environment import RetailToolEnvironment
+from toolrl.formatting import (
+    INPUT_FORMAT,
+    canonical_messages,
+    canonical_tool_schemas,
+    sft_conversation,
+)
 from toolrl.io import read_jsonl
 from toolrl.rollout import environment_tools
 
@@ -27,7 +33,6 @@ def main() -> int:
     import torch
     from datasets import Dataset
     from transformers import AutoTokenizer
-    from transformers.utils import get_json_schema
     from trl import SFTConfig, SFTTrainer
     from trl.chat_template_utils import add_response_schema, get_training_chat_template
 
@@ -38,19 +43,9 @@ def main() -> int:
         if patched is not None:
             current.chat_template = patched
     tools = environment_tools(RetailToolEnvironment())
-    # SFT serializes schemas with sort_keys=True before TRL deserializes them.
-    schemas = json.loads(json.dumps([get_json_schema(tool) for tool in tools], sort_keys=True))
+    schemas = canonical_tool_schemas(tools)
     rows = [row for path in args.data for row in read_jsonl(path)]
-    conversations = []
-    for row in rows:
-        boundary = int(row.get("completion_start", 2))
-        conversations.append(
-            {
-                "prompt": row["messages"][:boundary],
-                "completion": row["messages"][boundary:],
-                "tools": json.dumps(schemas, sort_keys=True),
-            }
-        )
+    conversations = [sft_conversation(row, schemas) for row in rows]
     # Inspect the installed trainer's real preprocessing and collator rather than
     # assuming how a particular TRL version combines the two masks.
     dataset = Dataset.from_list(conversations)
@@ -100,10 +95,16 @@ def main() -> int:
         context_matches = feature["input_ids"][: len(context_ids)] == context_ids
         prompt_labels = labels[: min(prefix_length, len(labels))]
         inference_ids = inference_tokenizer.apply_chat_template(
-            row["messages"][:boundary], tools=tools, add_generation_prompt=True, return_dict=True
+            canonical_messages(row["messages"][:boundary]),
+            tools=canonical_tool_schemas(tools),
+            add_generation_prompt=True,
+            return_dict=True,
         )["input_ids"]
         canonical_inference_ids = inference_tokenizer.apply_chat_template(
-            row["messages"][:boundary], tools=schemas, add_generation_prompt=True, return_dict=True
+            canonical_messages(row["messages"][:boundary]),
+            tools=schemas,
+            add_generation_prompt=True,
+            return_dict=True,
         )["input_ids"]
         supervised = [token for token, label in zip(feature["input_ids"], labels) if label != -100]
         examples.append(
@@ -128,6 +129,7 @@ def main() -> int:
         )
     summary = {
         "model_id": args.model_id,
+        "input_format": INPUT_FORMAT,
         "data": [str(path) for path in args.data],
         "max_length": args.max_length,
         "samples": len(examples),
@@ -167,6 +169,8 @@ def main() -> int:
                 "empty_supervision_samples",
                 "context_mismatch_samples",
                 "audited_token_mismatch_samples",
+                "generation_prefix_mismatch_samples",
+                "train_inference_prompt_mismatch_samples",
                 "truncated_samples",
             )
         )

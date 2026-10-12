@@ -1,0 +1,57 @@
+{
+  "model_id": "models/Qwen3-1.7B",
+  "input_format": "canonical-v4",
+  "data": [
+    "data/diverse/sft_train.jsonl",
+    "data/diverse/sft_repair_train.jsonl"
+  ],
+  "max_length": 4096,
+  "samples": 600,
+  "repair_samples": 300,
+  "unmasked_prompt_samples": 0,
+  "empty_supervision_samples": 0,
+  "context_mismatch_samples": 0,
+  "audited_token_mismatch_samples": 0,
+  "generation_prefix_mismatch_samples": 0,
+  "train_inference_prompt_mismatch_samples": 0,
+  "schema_order_mismatch_samples": 0,
+  "arrow_context_mismatch_samples": 0,
+  "truncated_samples": 0,
+  "max_tokens": 2330,
+  "examples": [
+    {
+      "task_id": "train-cancel_processing-0000-diverse",
+      "family": "cancel_processing",
+      "repair": false,
+      "tokens": 1983,
+      "truncated": false,
+      "supervised_tokens": 200,
+      "prompt_fully_masked": true,
+      "context_is_prefix": true,
+      "audited_tokens_match_trainer": true,
+      "generation_prefix_is_prefix": true,
+      "generation_prefix_untrained_suffix": "",
+      "train_inference_prompt_identical": true,
+      "schema_order_identical": true,
+      "arrow_context_identical": true,
+      "supervised_preview": "<think>\n\n</think>\n\n<tool_call>\n{\"name\": \"lookup_user\", \"arguments\": {\"email\": \"river-d2ba5da45a@mailbox.test\"}}\n</tool_call><|im_end|>\n<think>\n\n</think>\n\n<tool_call>\n{\"name\": \"list_orders\", \"arguments\": {\"user_id\": 10000"
+    },
+    {
+      "task_id": "train-cancel_processing-0000-diverse-repair",
+      "family": "cancel_processing",
+      "repair": true,
+      "tokens": 2055,
+      "truncated": false,
+      "supervised_tokens": 104,
+      "prompt_fully_masked": true,
+      "context_is_prefix": true,
+      "audited_tokens_match_trainer": true,
+      "generation_prefix_is_prefix": true,
+      "generation_prefix_untrained_suffix": "",
+      "train_inference_prompt_identical": true,
+      "schema_order_identical": true,
+      "arrow_context_identical": true,
+      "supervised_preview": "<think>\n\n</think>\n\n<tool_call>\n{\"name\": \"cancel_order\", \"arguments\": {\"order_id\": 20000}}\n</tool_call><|im_end|>\n<think>\n\n</think>\n\n<tool_call>\n{\"name\": \"issue_refund\", \"arguments\": {\"amount_cents\": 10900, \"order_id\": 20"
+    }
+  ]
+}

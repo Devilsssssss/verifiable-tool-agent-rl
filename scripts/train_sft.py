@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import sys
+from importlib.metadata import version
 from pathlib import Path
 
 os.environ.setdefault("USE_TF", "0")
@@ -13,6 +15,7 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from toolrl.environment import RetailToolEnvironment
+from toolrl.formatting import INPUT_FORMAT, canonical_tool_schemas, sft_conversation
 from toolrl.io import read_jsonl
 from toolrl.rollout import environment_tools
 
@@ -40,7 +43,6 @@ def main() -> int:
     from datasets import Dataset
     from peft import LoraConfig
     from transformers import AutoTokenizer
-    from transformers.utils import get_json_schema
     from trl import SFTConfig, SFTTrainer
     from trl.chat_template_utils import get_training_chat_template
 
@@ -49,25 +51,10 @@ def main() -> int:
     if patched_template is not None:
         tokenizer.chat_template = patched_template
     tools = environment_tools(RetailToolEnvironment())
-    tool_schemas = [get_json_schema(tool) for tool in tools]
+    tool_schemas = canonical_tool_schemas(tools)
 
     def as_conversations(rows: list[dict]) -> Dataset:
-        examples = []
-        for row in rows:
-            example = {
-                "task_id": row["task_id"],
-                "family": row["family"],
-                "tools": json.dumps(tool_schemas, sort_keys=True),
-            }
-            if "messages" in row:
-                completion_start = int(row.get("completion_start", 2))
-                example["prompt"] = row["messages"][:completion_start]
-                example["completion"] = row["messages"][completion_start:]
-            else:
-                example["prompt"] = row["prompt"]
-                example["completion"] = row["completion"]
-            examples.append(example)
-        return Dataset.from_list(examples)
+        return Dataset.from_list([sft_conversation(row, tool_schemas) for row in rows])
 
     train_rows = read_jsonl(args.train)
     primary_train_samples = len(train_rows)
@@ -122,7 +109,7 @@ def main() -> int:
         processing_class=tokenizer,
         peft_config=peft_config,
     )
-    trainer.train()
+    result = trainer.train()
     trainer.save_model(str(args.output_dir))
     tokenizer.save_pretrained(args.output_dir)
     manifest = {
@@ -141,6 +128,20 @@ def main() -> int:
         "assistant_only_loss": True,
         "completion_only_loss": True,
         "repair_prefix_supervised": False,
+        "input_format": INPUT_FORMAT,
+        "batch_size": args.batch_size,
+        "gradient_accumulation": args.gradient_accumulation,
+        "optimizer_steps": trainer.state.global_step,
+        "train_metrics": result.metrics,
+        "dataset_sha256": {
+            str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+            for path in (args.train, args.train_extra, args.validation, args.validation_extra)
+            if path is not None
+        },
+        "libraries": {
+            name: version(name)
+            for name in ("torch", "transformers", "trl", "datasets", "peft", "pyarrow")
+        },
     }
     (args.output_dir / "training_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

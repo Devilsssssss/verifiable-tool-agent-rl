@@ -12,6 +12,8 @@ artifacts/*
 !artifacts/*summary.json
 
 data/generated/
+data/diverse/
+data/confirmation/
 outputs/
 checkpoints/
 models/

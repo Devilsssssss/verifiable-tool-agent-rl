@@ -1,0 +1,18 @@
+{
+  "stage": "sft",
+  "base_model": "models/Qwen3-1.7B",
+  "train_samples": 600,
+  "primary_train_samples": 300,
+  "extra_train_samples": 300,
+  "validation_samples": 120,
+  "primary_validation_samples": 60,
+  "extra_validation_samples": 60,
+  "epochs": 1.0,
+  "learning_rate": 0.0002,
+  "max_length": 4096,
+  "seed": 45,
+  "assistant_only_loss": true,
+  "completion_only_loss": true,
+  "repair_prefix_supervised": false,
+  "input_format": "canonical-v4"
+}

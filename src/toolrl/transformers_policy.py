@@ -5,6 +5,8 @@ import os
 from collections.abc import Callable
 from typing import Any
 
+from .formatting import INPUT_FORMAT, canonical_messages, canonical_tool_schemas
+
 os.environ.setdefault("USE_TF", "0")
 
 
@@ -31,9 +33,7 @@ def normalize_tool_response(response: dict[str, Any]) -> dict[str, Any]:
             arguments = function["arguments"]
             clean_arguments = {key: value for key, value in arguments.items() if value is not None}
             changed = changed or len(clean_arguments) != len(arguments)
-            cleaned_calls.append(
-                {**call, "function": {**function, "arguments": clean_arguments}}
-            )
+            cleaned_calls.append({**call, "function": {**function, "arguments": clean_arguments}})
         if changed:
             return {**response, "tool_calls": cleaned_calls}
         return response
@@ -78,6 +78,7 @@ class TransformersToolPolicy:
         max_new_tokens: int = 256,
         temperature: float = 0.0,
         top_p: float = 0.9,
+        input_format: str = INPUT_FORMAT,
     ) -> None:
         from trl.chat_template_utils import add_response_schema, get_training_chat_template
 
@@ -89,6 +90,9 @@ class TransformersToolPolicy:
         self.max_new_tokens = max_new_tokens
         self.temperature = temperature
         self.top_p = top_p
+        if input_format not in (INPUT_FORMAT, "legacy-v3"):
+            raise ValueError(f"unsupported input format: {input_format}")
+        self.input_format = input_format
 
     def __call__(
         self,
@@ -99,8 +103,8 @@ class TransformersToolPolicy:
         from trl.chat_template_utils import parse_response
 
         encoded = self.tokenizer.apply_chat_template(
-            messages,
-            tools=tools,
+            canonical_messages(messages) if self.input_format == INPUT_FORMAT else messages,
+            tools=canonical_tool_schemas(tools) if self.input_format == INPUT_FORMAT else tools,
             add_generation_prompt=True,
             tokenize=True,
             return_dict=True,

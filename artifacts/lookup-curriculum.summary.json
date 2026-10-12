@@ -1,0 +1,28 @@
+{
+  "seed": 45,
+  "independent_training_tasks": 300,
+  "normal_views": 300,
+  "repair_views": 300,
+  "lookup_views": 300,
+  "total_views": 900,
+  "lookup_replay_verified": 300,
+  "frame_counts": {
+    "3": 21,
+    "2": 24,
+    "4": 28,
+    "8": 24,
+    "7": 19,
+    "10": 33,
+    "9": 17,
+    "0": 27,
+    "5": 33,
+    "11": 23,
+    "1": 20,
+    "6": 31
+  },
+  "source_sha256": "7d086b385f635fc43f997810dce953c9ba46de10998b4291778b157d27b3ecde",
+  "extra_sha256": "7b8156aea9949fe480dc5ab964a0e078959d2a8c17471d713a1a1b7386abb4c3",
+  "development_driven": true,
+  "held_out_modified": false,
+  "scope": "First-call supervision; does not add independent business tasks."
+}

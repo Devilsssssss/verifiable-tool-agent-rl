@@ -14,6 +14,7 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from toolrl.environment import RetailToolEnvironment
+from toolrl.formatting import INPUT_FORMAT, sort_template_json
 from toolrl.io import read_jsonl
 
 
@@ -53,6 +54,7 @@ def main() -> int:
     patched_template = get_training_chat_template(tokenizer)
     if patched_template is not None:
         tokenizer.chat_template = patched_template
+    sort_template_json(tokenizer)
 
     base_model = AutoModelForCausalLM.from_pretrained(
         args.model_id,
@@ -112,6 +114,7 @@ def main() -> int:
         "temperature": args.temperature,
         "top_p": args.top_p,
         "seed": args.seed,
+        "input_format": INPUT_FORMAT,
     }
     (args.output_dir / "training_manifest.json").write_text(
         json.dumps(manifest, indent=2) + "\n", encoding="utf-8"

@@ -1,0 +1,45 @@
+{
+  "tasks": 480,
+  "split_counts": {
+    "test": 120,
+    "train": 300,
+    "validation": 60
+  },
+  "family_counts": {
+    "cancel_processing": 96,
+    "cancel_shipped": 96,
+    "exchange_cheaper": 96,
+    "return_eligible": 96,
+    "return_expired": 96
+  },
+  "expert_successes": 480,
+  "noop_successes": 0,
+  "direct_shortcut_successes": 0,
+  "mean_expert_shaped_reward": 1.4000000000000001,
+  "entity_overlap_across_splits": 0,
+  "task_sha256": "a1788fef7acb97208a41652f1aceed4e6ff8be91c669ac40b46ef10909796366",
+  "status": "pass",
+  "augmentation_seed": 45,
+  "source_sha256": "d122f65101e6ffb9ddb4c386c520a8d555e9e9b80218771314f40b8fbd38cfaf",
+  "source_tasks": 300,
+  "independent_training_tasks": 300,
+  "training_views": 600,
+  "training_template_counts": {
+    "train-cancel_processing-diverse-1": 16,
+    "train-cancel_shipped-diverse-1": 24,
+    "train-exchange_cheaper-diverse-1": 22,
+    "train-return_eligible-diverse-1": 28,
+    "train-return_expired-diverse-1": 20,
+    "train-exchange_cheaper-diverse-2": 21,
+    "train-return_expired-diverse-0": 24,
+    "train-cancel_processing-diverse-0": 18,
+    "train-cancel_shipped-diverse-0": 13,
+    "train-cancel_processing-diverse-2": 26,
+    "train-cancel_shipped-diverse-2": 23,
+    "train-return_expired-diverse-2": 16,
+    "train-exchange_cheaper-diverse-0": 17,
+    "train-return_eligible-diverse-0": 16,
+    "train-return_eligible-diverse-2": 16
+  },
+  "held_out_modified": false
+}

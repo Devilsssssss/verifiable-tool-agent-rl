@@ -1,0 +1,10 @@
+# Direct training dependencies used on the Linux / RTX 3090 machine.
+# Install after creating a Python 3.12 virtual environment.
+torch==2.5.1
+transformers==5.2.0
+trl==1.14.2
+datasets==5.1.0
+peft==0.21.2
+accelerate==1.15.0
+numpy==1.26.4
+pyarrow==25.0.1

@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
+from toolrl.formatting import INPUT_FORMAT
 from toolrl.io import load_tasks, write_jsonl
 from toolrl.metrics import summarize_reports
 from toolrl.rollout import run_episode
@@ -31,6 +32,7 @@ def main() -> int:
     parser.add_argument("--max-new-tokens", type=int, default=256)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--input-format", choices=(INPUT_FORMAT, "legacy-v3"), default=INPUT_FORMAT)
     args = parser.parse_args()
 
     import torch
@@ -57,12 +59,17 @@ def main() -> int:
         tokenizer,
         max_new_tokens=args.max_new_tokens,
         temperature=args.temperature,
+        input_format=args.input_format,
     )
     records = []
+    partial_path = args.output.with_suffix(".partial.jsonl")
     for index, task in enumerate(tasks, start=1):
         record = run_episode(task, policy)
         record["run_name"] = args.run_name
         records.append(record)
+        # A failed/interrupted run retains clearly labelled partial trajectories.
+        # Only a finished run writes the requested output and its summary.
+        write_jsonl(partial_path, records)
         print(
             json.dumps(
                 {
@@ -75,7 +82,7 @@ def main() -> int:
             ),
             flush=True,
         )
-    write_jsonl(args.output, records)
+    partial_path.replace(args.output)
     summary = {
         "run_name": args.run_name,
         "model_id": args.model_id,
@@ -83,6 +90,7 @@ def main() -> int:
         "seed": args.seed,
         "temperature": args.temperature,
         "max_new_tokens": args.max_new_tokens,
+        "input_format": args.input_format,
         "tasks_path": str(args.tasks),
         "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
         "limit": args.limit,

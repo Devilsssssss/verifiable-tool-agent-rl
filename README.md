@@ -11,7 +11,7 @@
 - 有效工具调用率；
 - 未见用户、商品、订单标识和提示措辞上的泛化能力。
 
-正式实验使用 `Qwen3-1.7B + LoRA`。`Qwen2.5-Coder-0.5B-Instruct` 只用于低成本验证训练、解析和评测链路，不作为最终结论。
+当前训练实验使用 `Qwen3-1.7B + LoRA`。`Qwen2.5-Coder-0.5B-Instruct` 只用于低成本验证训练、解析和评测链路，不作为最终结论。目前尚未获得可信的 RL 增益证据。
 
 ## 环境与任务
 
@@ -26,7 +26,7 @@
   -> 数据库终态 + 完整调用轨迹 -> reward
 ```
 
-当前包含五类任务：处理中订单取消、已发货订单拒绝并升级、低价换货并退差价、期限内退货、过期退货拒绝并升级。每条任务还包含干扰订单和干扰商品，避免只凭位置猜目标。
+当前包含五类任务：处理中订单取消、已发货订单拒绝并升级、低价换货并退差价、期限内退货、过期退货拒绝并升级。每条任务包含干扰订单和干扰商品，但目标订单始终排在第一，模型仍可能利用位置规律；当前不能证明订单位置泛化。
 
 环境强制检查：先查询再使用标识、修改前检查订单、换货前检查库存、只向原支付方式退还精确金额、超过退货期或系统能力时保持业务状态不变并升级人工。
 
@@ -102,19 +102,47 @@ v1 的 35% 是旧版全轨迹训练的探索性结果，不能归因于“正确
 
 `scripts/audit_rollouts.py` 重放已保存的调用轨迹，核对每步结果与原有严格分数，再统计终态和恢复；重放不会生成新的模型回答。详细结果见 `artifacts/*-replay.summary.json`。
 
+### 格式修复与训练覆盖诊断
+
+`canonical-v4` 将工具参数存为稳定的 JSON 字符串，避免 Arrow 合并不同工具的参数字段；训练与推理共用参数转换和排序后的 schema。600 条训练视图的真实 SFTTrainer 审计中，提示差异、掩码错误、截断均为 0。GRPO 原生工具循环也统一 JSON 排序，3900 个助手生成位置与 SFT/推理前缀逐 token 一致。
+
+| 实验 | 评测 | 严格成功 | 错误邮箱任务 |
+| --- | --- | ---: | ---: |
+| 原始 1.7B，canonical 推理格式 | validation-20 | 0/20 | 5/20 |
+| v3，仅更换 canonical 推理格式 | validation-20 | 0/20 | 20/20 |
+| v4，相同 600 视图 / 1 epoch / seed 45，修复训练格式 | validation-20 | 0/20 | 20/20 |
+| 同一 v4，在训练任务上的诊断 | train-10 | 10/10 | 未单独统计 |
+| v5，增强训练实体与三种问法，600 视图 / 1 epoch / seed 45 | validation-20 | 0/20 | 20/20 |
+
+v4 会把 `For account` 一起复制进邮箱。这支持继续检查训练覆盖，而不能把格式审计通过当成行为能力改善。训练任务诊断不是泛化成绩。
+
+`scripts/augment_training.py` 只变换训练集的邮箱、商品名称和三种训练措辞，保持订单 ID、金额、业务状态、目标和预算不变；输出仍为 300 个独立任务、600 个正常/修复视图。验证和测试文件不变。新数据与开发划分一起通过 480 条专家、空操作、隐藏 ID 和实体重叠审计。
+
+新确认集由 `scripts/create_confirmation.py` 固定 seed 20261012 生成，120 条任务包含新 ID、邮箱、商品名称及每类一种新措辞。用户显示姓名仍沿用原测试任务；实体重叠审计检查 ID、邮箱和商品名称，不包括显示姓名。该确认集保持目标订单排在第一，不能证明订单位置泛化；不用于选择检查点或训练数据。具体对照与进入 RL 的门槛见 [实验口径](docs/format_control.md)。
+
+`scripts/probe_email.py` 固定 10 个验证任务的邮箱、商品，只改变用户问法，单独测首个 `lookup_user` 调用。v5 在原问法下为 0/10，三组已见训练问法分别为 10/10。该诊断支持措辞敏感性，不能当成完整任务成功率。结果见 `artifacts/qwen3-sft-repair-v5-email-probe.summary.json`。
+
+`scripts/create_lookup_curriculum.py` 因此增加 300 条训练用首调用监督，使用 12 种邮箱句式，保留原有 300 正常和 300 修复视图。v6 共 900 个视图，仍只有 300 个独立业务任务；这不是等预算的单变量实验。新增样本不包含验证或确认集任务，邮箱查询逐条重放核验。
+
 ## 复现
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev,train]"
+# 已验证的 Linux / Python 3.12 训练机直接依赖版本，并非完整传递依赖锁。
+pip install -r requirements-training.lock
 
 python scripts/generate_tasks.py
 python scripts/audit_tasks.py
 python scripts/run_baselines.py
 pytest
 ruff check .
+python scripts/demo.py
+python scripts/demo.py --family return_eligible --inject-format-error
 ```
+
+两个演示命令已在不安装任何项目依赖的新 Python 虚拟环境中执行通过；使用脚本专家，不加载模型。训练环境的实际版本另由训练摘要记录。
 
 设置本地模型目录后运行 SFT：
 
@@ -130,17 +158,54 @@ python scripts/train_sft.py \
   --train-extra data/generated/sft_repair_train.jsonl \
   --validation data/generated/sft_validation.jsonl \
   --validation-extra data/generated/sft_repair_validation.jsonl \
-  --output-dir outputs/qwen3-1.7b-tool-sft-repair-v3 \
+  --output-dir outputs/qwen3-1.7b-tool-sft-repair-v4 \
   --epochs 1 --learning-rate 2e-4 \
   --batch-size 1 --gradient-accumulation 8 --seed 45
 
 python scripts/audit_sft_masks.py \
   --model-id "$MODEL_DIR" \
   --data data/generated/sft_train.jsonl data/generated/sft_repair_train.jsonl \
-  --output artifacts/qwen3-sft-repair-v3-mask-audit.summary.json
+  --output artifacts/qwen3-sft-repair-v4-mask-audit.summary.json
 ```
 
-混合版共有 600 个训练视图，来自 300 个独立任务；验证集 120 个视图来自 60 个独立任务。正常视图监督完整正确调用序列，修复视图的错误调用和执行报错仅作上下文。当前命令复现 v3 的训练口径，不复现历史 v1 的全轨迹损失。
+混合版共有 600 个训练视图，来自 300 个独立任务；验证集 120 个视图来自 60 个独立任务。正常视图监督完整正确调用序列，修复视图的错误调用和执行报错仅作上下文。当前训练代码采用 canonical-v4 格式，不复现历史 v1 的全轨迹损失或 v3 的 Arrow 参数结构。
+
+生成训练覆盖增强数据及冻结的新确认集：
+
+```bash
+python scripts/augment_training.py
+python scripts/create_confirmation.py
+
+python scripts/train_sft.py \
+  --model-id "$MODEL_DIR" \
+  --train data/diverse/sft_train.jsonl \
+  --train-extra data/diverse/sft_repair_train.jsonl \
+  --validation data/generated/sft_validation.jsonl \
+  --validation-extra data/generated/sft_repair_validation.jsonl \
+  --output-dir outputs/qwen3-1.7b-tool-sft-repair-v5 \
+  --epochs 1 --learning-rate 2e-4 \
+  --batch-size 1 --gradient-accumulation 8 --seed 45
+```
+
+增加首调用课程后的训练命令：
+
+```bash
+python scripts/create_lookup_curriculum.py
+python scripts/audit_sft_masks.py \
+  --model-id "$MODEL_DIR" \
+  --data data/diverse/sft_train.jsonl data/diverse/sft_repair_lookup_train.jsonl \
+  --output artifacts/qwen3-sft-repair-v6-mask-audit.summary.json
+
+python scripts/train_sft.py \
+  --model-id "$MODEL_DIR" \
+  --train data/diverse/sft_train.jsonl \
+  --train-extra data/diverse/sft_repair_lookup_train.jsonl \
+  --validation data/generated/sft_validation.jsonl \
+  --validation-extra data/generated/sft_repair_validation.jsonl \
+  --output-dir outputs/qwen3-1.7b-tool-sft-repair-v6 \
+  --epochs 1 --learning-rate 2e-4 \
+  --batch-size 1 --gradient-accumulation 8 --seed 45
+```
 
 分别从同一个 SFT adapter 运行两组 GRPO：
 
@@ -167,7 +232,8 @@ python scripts/evaluate_model.py \
   --tasks data/generated/tasks_test.jsonl \
   --output artifacts/qwen3-1.7b-tool-sft-repair-v3-test-20.jsonl \
   --run-name qwen3-1.7b-tool-sft-repair-v3-test-20 \
-  --limit 20 --max-new-tokens 512 --temperature 0 --seed 42
+  --limit 20 --max-new-tokens 512 --temperature 0 --seed 42 \
+  --input-format legacy-v3
 
 python scripts/audit_rollouts.py \
   --tasks data/generated/tasks_test.jsonl \
@@ -180,6 +246,7 @@ python scripts/audit_rollouts.py \
 ## 当前限制
 
 - 当前测试集验证未见实体和未见措辞，不等同于未见任务类型的组合泛化。
+- 原数据和新确认集的目标订单均在第一位置；订单选择鲁棒性需要另设随机位置的任务及可观察专家策略。
 - 测试结果已用于诊断和设计后续训练数据，因此属于开发阶段的探索性评测；后续确认实验需要另设未用于调参的评测集。
 - 当前严格奖励把可恢复的参数格式错误和业务政策违规都视为失败；应先明确奖励设计与恢复能力的研究目标，再开展新的 RL 对照。
 - SQLite 工具环境比真实客服系统更干净，结论不能直接外推到生产环境。
