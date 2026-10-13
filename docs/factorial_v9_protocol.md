@@ -99,8 +99,9 @@ python scripts/audit_rollouts.py --tasks data/generated/tasks_validation.jsonl \
 与v8及两候选之间的逐题比较均无新增成功，也无丢失成功。全零差值的bootstrap
 区间退化为[0,0]，不能据此宣布总体等效或所有SFT方案无效。
 
-按预设止损条件停止本轮同类SFT扩充；未扩测完整validation-60、未启动新GRPO、
-未使用冻结确认集评测或选版本。负结果只适用于当前模型、训练预算和开发子集。
+按预设止损条件停止原始提示协议下的同类SFT扩充；未启动新GRPO，也未用确认集
+反向选版本。之后仅在固定显式字段协议下完成了 validation-60 和冻结确认集对照，
+结果见文末。负结果仍只适用于当前模型、训练预算和输入协议。
 
 训练manifest、原始生成诊断、评测及重放摘要保存于`artifacts/`，模型权重仅在
 训练服务器。adapter SHA256：
