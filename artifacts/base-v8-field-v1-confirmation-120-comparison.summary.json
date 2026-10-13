@@ -1,0 +1,27 @@
+{
+  "baseline": "artifacts/base-field-v1-confirmation-120.jsonl",
+  "candidate": "artifacts/v8-field-v1-confirmation-120.jsonl",
+  "paired_tasks": 120,
+  "protocol": {
+    "tasks_sha256": "80d26eb0d34ebe3080b656c6826ee127c3aa7a892bcb24a9c9149fc282e6fd2d",
+    "limit": 120,
+    "seed": 42,
+    "temperature": 0.0,
+    "max_new_tokens": 512,
+    "input_format": "canonical-v4",
+    "scoring_protocol": "strict-v1-with-terminal-diagnostics",
+    "input_intervention": "explicit-email-field-v1"
+  },
+  "baseline_successes": 2,
+  "candidate_successes": 120,
+  "gained_tasks": 118,
+  "lost_tasks": 0,
+  "strict_success_difference": 0.9833333333333333,
+  "paired_bootstrap_95_interval": [
+    0.9583333333333334,
+    1.0
+  ],
+  "bootstrap_seed": 42,
+  "bootstrap_resamples": 5000,
+  "scope": "Exploratory paired task bootstrap; tasks share synthetic templates. Does not quantify model-training seed variability or establish causality. A degenerate all-zero interval is not evidence of population equivalence. Comparisons with an input intervention are valid only within that same intervention."
+}
