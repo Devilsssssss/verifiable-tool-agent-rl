@@ -187,7 +187,7 @@ adapter为120/120，五个业务族均为24/24，逐条重放一致。配对比�
 增益、0条损失，任务级 bootstrap 区间为[0.958, 1.000]；这支持字段协议下
 的泛化差异，但不改变原始提示协议 validation-20 为0/20的事实。
 
-简历和面试口径见 [项目总结](docs/project_summary.md)。
+简历和面试口径见 [项目总结](docs/project_summary.md)；常见追问见 [项目面试问答](docs/interview_qa.md)。
 
 旧两组 30 步 GRPO 日志的奖励审计显示：稀疏奖励 29/30 步、过程奖励 28/30 步的组内奖励标准差为零。均值奖励很高也可能只是重复相同轨迹。`scripts/audit_training_logs.py` 保存原日志哈希和原生统计；`scripts/probe_reward_groups.py` 在训练任务上采样，预检两种奖励是否具有组内差异。推理预检与原生 GRPO 工具循环不同，不能互相替代。
 
