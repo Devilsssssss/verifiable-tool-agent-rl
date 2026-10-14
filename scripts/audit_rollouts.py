@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from toolrl.environment import RetailToolEnvironment
+from toolrl.environment import SCORING_PROTOCOL, RetailToolEnvironment
 from toolrl.expert import reset_environment
 from toolrl.io import load_tasks, read_jsonl
 from toolrl.metrics import summarize_reports
@@ -24,6 +24,14 @@ def main() -> int:
     args = parser.parse_args()
     tasks = {task.task_id: task for task in load_tasks(args.tasks)}
     records = read_jsonl(args.rollouts)
+    rollout_summary = json.loads(
+        args.rollouts.with_suffix(".summary.json").read_text(encoding="utf-8")
+    )
+    source_protocol = rollout_summary.get("scoring_protocol")
+    if source_protocol != SCORING_PROTOCOL:
+        raise ValueError(
+            f"rollouts use {source_protocol}; run scripts/rescore_rollouts.py before audit"
+        )
     assisted = [bool(record.get("oracle_first_lookup", False)) for record in records]
     if any(assisted) and not all(assisted):
         raise ValueError("cannot pool oracle-assisted and unaided rollouts")
@@ -64,11 +72,15 @@ def main() -> int:
         "input_intervention": next(iter(interventions)),
         "rollouts": str(args.rollouts),
         "tasks": str(args.tasks),
+        "scoring_protocol": source_protocol,
         "replay_verified": len(reports),
         "original_scores_unchanged": True,
         "wrong_email_tasks": wrong_email_tasks,
         "definition": {
-            "task_success": "Original strict success: correct terminal state and no violations.",
+            "task_success": (
+                "Strict success: correct terminal state, no violations, and the target order "
+                "was inspected."
+            ),
             "terminal_goal_completion": "Correct terminal state, independent of prior violations.",
             "format_recovery_rate": (
                 "Correct terminal state with only invalid_tool_call violations, divided by "

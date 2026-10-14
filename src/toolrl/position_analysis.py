@@ -29,7 +29,7 @@ def analyze_position_runs(
         strata[f"position_{position}"].append(task_id)
         strata[f"{task.family}/position_{position}"].append(task_id)
 
-    return {
+    report = {
         "strata": {
             name: _paired_summary(task_ids, run_indexes[0], run_indexes[1])
             for name, task_ids in sorted(strata.items())
@@ -47,6 +47,12 @@ def analyze_position_runs(
             "They measure task-level position sensitivity, not training-seed variability."
         ),
     }
+    if all("trace" in row for index in run_indexes for row in index.values()):
+        report["target_order_selection"] = {
+            "baseline": _selection_summary(strata, task_index, run_indexes[0]),
+            "candidate": _selection_summary(strata, task_index, run_indexes[1]),
+        }
+    return report
 
 
 def _unique_index(items: Any) -> dict[str, Any]:
@@ -90,3 +96,30 @@ def _position_difference(
         task_ids = strata[f"position_{position}"]
         rates.append(sum(bool(run[task_id]["success"]) for task_id in task_ids) / len(task_ids))
     return rates[1] - rates[0]
+
+
+def _selection_summary(
+    strata: dict[str, list[str]],
+    tasks: dict[str, AgentTask],
+    run: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    result = {}
+    for name in ("overall", "position_1", "position_2"):
+        task_ids = strata[name]
+        selected = sum(_selected_target(tasks[task_id], run[task_id]) for task_id in task_ids)
+        result[name] = {
+            "tasks": len(task_ids),
+            "target_order_selections": selected,
+            "target_order_selection_rate": selected / len(task_ids),
+        }
+    return result
+
+
+def _selected_target(task: AgentTask, record: dict[str, Any]) -> bool:
+    target_id = task.goal["order_id"]
+    inspected = [
+        step["arguments"].get("order_id")
+        for step in record["trace"]
+        if step["tool"] == "get_order" and step["success"]
+    ]
+    return target_id in inspected

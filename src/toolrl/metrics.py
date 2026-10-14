@@ -37,6 +37,10 @@ def summarize_reports(reports: list[dict[str, Any]]) -> dict[str, Any]:
                     "format_recovery_rate": recovered / error_tasks if error_tasks else None,
                 }
             )
+        if all("target_order_inspected" in row for row in rows):
+            summary["target_order_inspection_rate"] = sum(
+                bool(row["target_order_inspected"]) for row in rows
+            ) / count
         return summary
 
     return {

@@ -87,3 +87,20 @@ def test_recovery_rate_is_undefined_without_format_errors() -> None:
         }
     ]
     assert summarize_reports(rows)["overall"]["format_recovery_rate"] is None
+
+
+def test_target_order_inspection_rate_is_reported_when_available() -> None:
+    rows = [
+        {
+            "family": "cancel",
+            "success": inspected,
+            "policy_compliant": True,
+            "valid_tool_rate": 1.0,
+            "steps": 4,
+            "shaped": 1.0,
+            "target_order_inspected": inspected,
+        }
+        for inspected in (True, False)
+    ]
+
+    assert summarize_reports(rows)["overall"]["target_order_inspection_rate"] == 0.5

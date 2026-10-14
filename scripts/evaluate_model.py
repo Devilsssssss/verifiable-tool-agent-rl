@@ -15,6 +15,7 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from toolrl.diagnostics import ExplicitEmailPrompt
+from toolrl.environment import SCORING_PROTOCOL
 from toolrl.formatting import INPUT_FORMAT
 from toolrl.io import load_tasks, write_jsonl
 from toolrl.metrics import summarize_reports
@@ -77,6 +78,7 @@ def main() -> int:
     for index, task in enumerate(tasks, start=1):
         record = run_episode(task, policy)
         record["run_name"] = args.run_name
+        record["scoring_protocol"] = SCORING_PROTOCOL
         if args.input_intervention != "original":
             record["input_intervention"] = args.input_intervention
         records.append(record)
@@ -108,7 +110,7 @@ def main() -> int:
         "tasks_path": str(args.tasks),
         "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
         "limit": args.limit,
-        "scoring_protocol": "strict-v1-with-terminal-diagnostics",
+        "scoring_protocol": SCORING_PROTOCOL,
         **summarize_reports(records),
     }
     summary_path = args.output.with_suffix(".summary.json")

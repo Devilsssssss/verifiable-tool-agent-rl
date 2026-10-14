@@ -7,6 +7,8 @@ from copy import deepcopy
 from functools import wraps
 from typing import Any
 
+SCORING_PROTOCOL = "strict-v2-target-inspection"
+
 
 def _drop_null_tool_slots(method):
     """Accept schema-generated null slots while keeping non-null calls strict.
@@ -487,6 +489,7 @@ class RetailToolEnvironment:
             return {
                 "success": False,
                 "terminal_goal_satisfied": False,
+                "target_order_inspected": False,
                 "format_recovery_success": False,
                 "policy_compliant": True,
                 "violations": [],
@@ -499,6 +502,7 @@ class RetailToolEnvironment:
         success = self._goal_satisfied()
         violations = [step["violation"] for step in self._trace if step["violation"]]
         terminal_goal = self._terminal_goal_satisfied()
+        target_order_inspected = self._target_order_inspected()
         format_recovery = bool(
             terminal_goal
             and violations
@@ -522,6 +526,7 @@ class RetailToolEnvironment:
         return {
             "success": success,
             "terminal_goal_satisfied": terminal_goal,
+            "target_order_inspected": target_order_inspected,
             "format_recovery_success": format_recovery,
             "policy_compliant": compliant,
             "violations": violations,
@@ -671,7 +676,11 @@ class RetailToolEnvironment:
     def _goal_satisfied(self) -> bool:
         if any(step["violation"] for step in self._trace):
             return False
-        return self._terminal_goal_satisfied()
+        return self._target_order_inspected() and self._terminal_goal_satisfied()
+
+    def _target_order_inspected(self) -> bool:
+        order_id = self._goal.get("order_id")
+        return isinstance(order_id, int) and order_id in self._inspected_order_ids
 
     def _terminal_goal_satisfied(self) -> bool:
         """Check database outcome only; strict success still rejects all violations."""
