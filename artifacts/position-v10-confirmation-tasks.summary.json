@@ -1,0 +1,56 @@
+{
+  "input": "data/position-v10-confirmation/tasks_test.jsonl",
+  "output": "artifacts/position-v10-confirmation-tasks.jsonl",
+  "seed": 20261018,
+  "tasks": 120,
+  "input_sha256": "8a74eefd4ae287d126cb0cf4a5410d5f70a2cf74aa7e9d24abc0a8d4cf329c75",
+  "output_sha256": "4b641d51df65cdb065a1d4f7882f1e973c0c9c38d598e448165d2ff4dca268ae",
+  "position_counts": {
+    "1": 60,
+    "2": 60
+  },
+  "family_position_counts": {
+    "cancel_processing": {
+      "1": 12,
+      "2": 12
+    },
+    "cancel_shipped": {
+      "1": 12,
+      "2": 12
+    },
+    "exchange_cheaper": {
+      "1": 12,
+      "2": 12
+    },
+    "return_eligible": {
+      "1": 12,
+      "2": 12
+    },
+    "return_expired": {
+      "1": 12,
+      "2": 12
+    }
+  },
+  "semantic_audit": {
+    "tasks": 120,
+    "split_counts": {
+      "position-probe": 120
+    },
+    "family_counts": {
+      "cancel_processing": 24,
+      "cancel_shipped": 24,
+      "exchange_cheaper": 24,
+      "return_eligible": 24,
+      "return_expired": 24
+    },
+    "expert_successes": 120,
+    "noop_successes": 0,
+    "direct_shortcut_successes": 0,
+    "mean_expert_shaped_reward": 1.4000000000000001,
+    "entity_overlap_across_splits": 0,
+    "task_sha256": "1a91bfc489dfc9b37a4083308bb82ef708315bc2b487a90b64aa15c1200ba41f",
+    "status": "pass"
+  },
+  "transformation": "stratified random assignment of target order to list position 1 or 2; swap order IDs and every dependent reference together",
+  "scope": "Held-out position generalization probe; do not use outcomes for training, prompt changes, or checkpoint selection."
+}

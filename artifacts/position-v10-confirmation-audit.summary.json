@@ -1,0 +1,31 @@
+{
+  "seed": 20261017,
+  "id_offset": 40000000,
+  "confirmation_tasks": 120,
+  "audit": {
+    "tasks": 600,
+    "split_counts": {
+      "confirmation": 120,
+      "test": 120,
+      "train": 300,
+      "validation": 60
+    },
+    "family_counts": {
+      "cancel_processing": 120,
+      "cancel_shipped": 120,
+      "exchange_cheaper": 120,
+      "return_eligible": 120,
+      "return_expired": 120
+    },
+    "expert_successes": 600,
+    "noop_successes": 0,
+    "direct_shortcut_successes": 0,
+    "mean_expert_shaped_reward": 1.4000000000000001,
+    "entity_overlap_across_splits": 0,
+    "task_sha256": "8670da4f6371d7d0ed795151bb185ad0334432f98744e95a4aaa95c43a611f50",
+    "status": "pass"
+  },
+  "file_sha256": "8a74eefd4ae287d126cb0cf4a5410d5f70a2cf74aa7e9d24abc0a8d4cf329c75",
+  "selection_policy": "Do not use these outcomes to select prompts, checkpoints or data.",
+  "scope": "Fresh entities and one fresh request template per family; target order remains first."
+}

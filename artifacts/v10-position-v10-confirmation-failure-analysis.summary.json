@@ -1,0 +1,24 @@
+{
+  "rollouts": "artifacts/v10-position-v10-confirmation-120.jsonl",
+  "rollouts_sha256": "5e43222742e9b39126ec3e93c3196647490510a32f30371b0eea25941f9d0a51",
+  "scoring_protocol": "strict-v2-target-inspection",
+  "tasks": 120,
+  "strict_successes": 105,
+  "failures": 15,
+  "failed_target_order_inspected": 15,
+  "failure_patterns": {
+    "eligible_return_escalated_as_expired": {
+      "tasks": 6,
+      "position_1": 2,
+      "position_2": 4,
+      "definition": "The target had days_since_delivery=12, but the trace escalated instead of requesting the return."
+    },
+    "expired_return_retried_until_step_limit": {
+      "tasks": 9,
+      "position_1": 0,
+      "position_2": 9,
+      "definition": "The target had days_since_delivery=45, but the trace repeatedly called request_return after return_window_closed and reached the step limit."
+    }
+  },
+  "scope": "Deterministic classification of the 15 strict-v2 failures in the saved v10 confirmation rollouts; does not estimate training-seed variability."
+}
