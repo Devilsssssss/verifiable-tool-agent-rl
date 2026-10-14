@@ -18,7 +18,9 @@ def target_order_position(task: AgentTask) -> int:
     return order_ids.index(target_id) + 1
 
 
-def set_target_order_position(task: AgentTask, position: int) -> AgentTask:
+def set_target_order_position(
+    task: AgentTask, position: int, *, output_split: str = "position-probe"
+) -> AgentTask:
     """Place the target order at a requested rank without changing task semantics."""
     if position not in {1, 2}:
         raise ValueError("position must be 1 or 2")
@@ -50,7 +52,7 @@ def set_target_order_position(task: AgentTask, position: int) -> AgentTask:
     return replace(
         task,
         task_id=f"{task.task_id}-target-position-{position}",
-        split="position-probe",
+        split=output_split,
         initial_state=state,
         goal=goal,
         expert_plan=expert_plan,
@@ -62,8 +64,17 @@ def create_balanced_position_probe(
     tasks: list[AgentTask], *, seed: int
 ) -> list[AgentTask]:
     """Assign half of every task family to each target-order position."""
+    return create_balanced_position_tasks(tasks, seed=seed, output_split="position-probe")
+
+
+def create_balanced_position_tasks(
+    tasks: list[AgentTask], *, seed: int, output_split: str
+) -> list[AgentTask]:
+    """Assign half of every task family to each position for a named split."""
     if not tasks:
         raise ValueError("task collection is empty")
+    if not output_split:
+        raise ValueError("output_split must be nonempty")
 
     by_family: dict[str, list[int]] = defaultdict(list)
     for index, task in enumerate(tasks):
@@ -80,7 +91,10 @@ def create_balanced_position_probe(
         positions.update({index: 1 for index in shuffled[:midpoint]})
         positions.update({index: 2 for index in shuffled[midpoint:]})
 
-    probe = [set_target_order_position(task, positions[index]) for index, task in enumerate(tasks)]
+    probe = [
+        set_target_order_position(task, positions[index], output_split=output_split)
+        for index, task in enumerate(tasks)
+    ]
     counts = Counter((task.family, target_order_position(task)) for task in probe)
     for family, indices in by_family.items():
         expected = len(indices) // 2

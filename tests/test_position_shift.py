@@ -6,6 +6,7 @@ from toolrl.expert import replay_expert
 from toolrl.generator import FAMILIES, generate_tasks
 from toolrl.position_shift import (
     create_balanced_position_probe,
+    create_balanced_position_tasks,
     set_target_order_position,
     target_order_position,
 )
@@ -51,3 +52,12 @@ def test_balanced_probe_rejects_odd_family_counts() -> None:
     tasks = generate_tasks({"test": len(FAMILIES)}, seed=45)
     with pytest.raises(ValueError, match="even number"):
         create_balanced_position_probe(tasks, seed=20261014)
+
+
+def test_balanced_training_positions_preserve_train_split() -> None:
+    tasks = generate_tasks({"train": 20}, seed=48)
+    balanced = create_balanced_position_tasks(tasks, seed=49, output_split="train")
+    counts = Counter((task.family, target_order_position(task)) for task in balanced)
+
+    assert all(task.split == "train" for task in balanced)
+    assert all(counts[(family, position)] == 2 for family in FAMILIES for position in (1, 2))
