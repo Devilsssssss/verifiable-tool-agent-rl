@@ -1,0 +1,26 @@
+{
+  "status": "locked-before-training",
+  "protocol_commit": "30e2d5e",
+  "protocol": "docs/position_v10_protocol.md",
+  "candidate": "qwen3-1.7b-tool-sft-position-v10",
+  "base_model": "Qwen3-1.7B",
+  "training_seed": 45,
+  "training_views": 900,
+  "optimizer_steps_expected": 113,
+  "epochs": 1,
+  "learning_rate": 0.0002,
+  "batch_size": 1,
+  "gradient_accumulation": 8,
+  "max_length": 4096,
+  "evaluation_seed": 42,
+  "temperature": 0.0,
+  "max_new_tokens": 512,
+  "scoring_protocol": "strict-v2-target-inspection",
+  "primary_metric": "target-position-2 strict success",
+  "stop_threshold": "30/60",
+  "sha256": {
+    "sft_train": "03db19a1931ea80f5b3083c76a730b741d825ed460481813bc7f9c312293b24c",
+    "sft_repair_lookup_train": "555e4897279fa41a4f823ce85c1f6e387fa1647491bb4d7eaa2c59de7894a3eb",
+    "confirmation_tasks": "4b641d51df65cdb065a1d4f7882f1e973c0c9c38d598e448165d2ff4dca268ae"
+  }
+}

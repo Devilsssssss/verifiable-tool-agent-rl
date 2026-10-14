@@ -1,0 +1,71 @@
+{
+  "seed": 20261016,
+  "independent_training_tasks": 300,
+  "normal_views": 300,
+  "repair_views": 300,
+  "lookup_views": 300,
+  "total_views": 900,
+  "position_counts": {
+    "1": 150,
+    "2": 150
+  },
+  "family_position_counts": {
+    "cancel_processing": {
+      "1": 30,
+      "2": 30
+    },
+    "cancel_shipped": {
+      "1": 30,
+      "2": 30
+    },
+    "exchange_cheaper": {
+      "1": 30,
+      "2": 30
+    },
+    "return_eligible": {
+      "1": 30,
+      "2": 30
+    },
+    "return_expired": {
+      "1": 30,
+      "2": 30
+    }
+  },
+  "semantic_audit": {
+    "tasks": 720,
+    "split_counts": {
+      "confirmation": 120,
+      "position-probe": 120,
+      "test": 120,
+      "train": 300,
+      "validation": 60
+    },
+    "family_counts": {
+      "cancel_processing": 144,
+      "cancel_shipped": 144,
+      "exchange_cheaper": 144,
+      "return_eligible": 144,
+      "return_expired": 144
+    },
+    "expert_successes": 720,
+    "noop_successes": 0,
+    "direct_shortcut_successes": 0,
+    "mean_expert_shaped_reward": 1.4000000000000001,
+    "entity_overlap_across_splits": 0,
+    "task_sha256": "9e524ea6869a1a0730db04f0de39a0fb88c912cc2e84f45a1f7d5ad8a81f4464",
+    "status": "pass"
+  },
+  "lookup_views_byte_identical_to_v8": true,
+  "source_sha256": {
+    "tasks": "e3684c5c2d24371d6dd65ccbdc53b92dd30a36d217f591e3c9108773331ef48f",
+    "lookup": "1dde933f7724b27e58e0182f89dbdfdf0f98baa944113e364cd5544614963784"
+  },
+  "output_sha256": {
+    "tasks": "5e2a7d360313d058e6b1f5ec4962e42bbf587f46de7fb8603192c6377c1646fc",
+    "normal": "03db19a1931ea80f5b3083c76a730b741d825ed460481813bc7f9c312293b24c",
+    "repairs": "3d761cbd5c969352817b04f930669a2512cbe9cd85cc173bf4ce389074686bac",
+    "lookup": "1dde933f7724b27e58e0182f89dbdfdf0f98baa944113e364cd5544614963784",
+    "extra": "555e4897279fa41a4f823ce85c1f6e387fa1647491bb4d7eaa2c59de7894a3eb"
+  },
+  "scope": "Development-driven SFT intervention. Only order position and dependent IDs change in normal/repair views; v8 lookup views are copied byte-for-byte."
+}
