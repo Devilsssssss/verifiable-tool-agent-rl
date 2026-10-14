@@ -20,9 +20,10 @@
 
 ## 冻结评测
 
-训练前使用 seed `20261017` 生成另一批 120 条新实体确认任务，再用 seed
-`20261018` 在每个业务族内平衡目标位置为 12/12。该集合不进入训练、提示词
-修改或 checkpoint 选择。
+训练前使用 seed `20261017` 和独立的 `40000000` ID offset 生成另一批 120 条
+新实体确认任务，再用 seed `20261018` 在每个业务族内平衡目标位置为 12/12。
+该集合与旧确认集也要通过 ID、邮箱和商品实体隔离审计，不进入训练、提示词修改
+或 checkpoint 选择。
 
 v8 与 v10 均使用显式邮箱字段 v1、greedy、512 tokens、seed 42 和
 `strict-v2-target-inspection`。主要指标按以下顺序读取：
@@ -39,6 +40,14 @@ SFT 扩充并分析商品匹配与订单选择机制，不启动 GRPO。即使�
 ## 复现命令
 
 ```bash
+python scripts/create_confirmation.py --seed 20261017 --count 120 \
+  --id-offset 40000000 --output-dir data/position-v10-confirmation \
+  --summary artifacts/position-v10-confirmation-audit.summary.json
+python scripts/create_position_shifted.py \
+  --input data/position-v10-confirmation/tasks_test.jsonl \
+  --output artifacts/position-v10-confirmation-tasks.jsonl \
+  --summary artifacts/position-v10-confirmation-tasks.summary.json --seed 20261018
+
 python scripts/create_position_training.py --data-dir data/diverse-v8 \
   --output-dir data/position-v10 --seed 20261016 \
   --heldout data/generated/tasks_validation.jsonl data/generated/tasks_test.jsonl \

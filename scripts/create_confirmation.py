@@ -43,6 +43,7 @@ def main() -> int:
     )
     parser.add_argument("--seed", type=int, default=20261012)
     parser.add_argument("--count", type=int, default=120)
+    parser.add_argument("--id-offset", type=int, default=20_000_000)
     parser.add_argument("--output-dir", type=Path, default=ROOT / "data/confirmation")
     parser.add_argument("--development-dir", type=Path, default=ROOT / "data/generated")
     parser.add_argument(
@@ -51,6 +52,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.count <= 0 or args.count % 5:
         raise ValueError("count must be a positive multiple of five")
+    if args.id_offset <= 0:
+        raise ValueError("id-offset must be positive")
     tasks = []
     for task in generate_tasks({"test": args.count}, seed=args.seed):
         code = hashlib.sha256(f"confirm:{args.seed}:{task.task_id}".encode()).hexdigest()[:10]
@@ -65,7 +68,7 @@ def main() -> int:
             products[2]["name"]: f"{brand} Charger {code}",
         }
         identifiers = {
-            row["id"]: row["id"] + 20_000_000
+            row["id"]: row["id"] + args.id_offset
             for table in ("users", "products", "orders")
             for row in task.initial_state[table]
         }
@@ -98,6 +101,7 @@ def main() -> int:
     write_jsonl(path, (task.to_dict() for task in tasks))
     summary = {
         "seed": args.seed,
+        "id_offset": args.id_offset,
         "confirmation_tasks": len(tasks),
         "audit": audit,
         "file_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
