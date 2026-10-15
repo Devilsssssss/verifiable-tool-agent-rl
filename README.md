@@ -4,6 +4,18 @@
 
 最新进展：位置平衡 SFT 的 v10 基线在新冻结的 120 条退货泛化任务上为 **58/120、54/120、46/120**。预注册的 return-v11 等视图年龄分布干预在 seed45/46 上分别得到 **56/120、81/120**，但在旧确认集回归上都低于匹配 v10（96/120 对 105/120、101/120）。因此结论是种子敏感且存在回归，不能声称稳定的 Agentic RL 或后训练增益。全部候选轨迹重放核验通过。详见[基线结果与限制](docs/return_holdout_baseline_results.md)、[v11 结果报告](docs/return_v11_results.md)及[数据干预协议](docs/return_boundary_protocol.md)。
 
+面试复核入口：先看 [项目总结](docs/project_summary.md)，再运行下面的失败差异分析（需要已生成的评测产物）：
+
+```bash
+python scripts/analyze_failure_deltas.py \
+  --tasks data/return-holdout/tasks_test.jsonl \
+  --baseline artifacts/return-holdout-seed46.jsonl \
+  --candidate artifacts/return-v11-seed46-holdout.jsonl \
+  --output artifacts/return-v11-46-holdout-failure-deltas.summary.json
+```
+
+该分析只读取保存的轨迹，不参与训练、选 checkpoint 或修改评分协议。
+
 ## 最小演示
 
 这条命令不需要 GPU、模型权重或外部服务，会运行一个脚本专家并展示工具调用、数据库终态和严格评分：
