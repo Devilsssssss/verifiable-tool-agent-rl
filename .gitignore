@@ -20,6 +20,8 @@ data/factorial-v9/
 data/position-confirmation/
 data/position-v10/
 data/position-v10-confirmation/
+data/return-holdout/
+data/return-v11/
 outputs/
 checkpoints/
 models/
