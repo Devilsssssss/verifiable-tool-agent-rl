@@ -4,7 +4,7 @@ import argparse
 import hashlib
 import json
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
@@ -75,6 +75,11 @@ def main() -> int:
         position_groups[f"{row['family']}/position_{row['target_position']}"].append(row)
         age_groups[f"{row['family']}/target_age_{row['target_age']}"].append(row)
 
+    metrics = summarize_reports(reports)
+    if any(source.get(key) != metrics[key] for key in ("overall", "by_family")):
+        raise ValueError("rollout summary metrics do not match saved rows")
+    failures = [row for row in reports if not row["success"]]
+
     summary = {
         "run_name": rows[0].get("run_name") if rows else None,
         "rollouts": len(rows),
@@ -83,8 +88,19 @@ def main() -> int:
         "scoring_protocol": rows[0].get("scoring_protocol") if rows else None,
         "input_intervention": rows[0].get("input_intervention", "original") if rows else None,
         "wrong_email_tasks": wrong_email_tasks,
-        "overall": summarize_reports(reports)["overall"],
-        "by_family": summarize_reports(reports)["by_family"],
+        **metrics,
+        "failure_diagnostics": {
+            "failed_tasks": len(failures),
+            "failed_without_target_inspection": sum(
+                not row["target_order_inspected"] for row in failures
+            ),
+            "failed_with_correct_terminal_state": sum(
+                row["terminal_goal_satisfied"] for row in failures
+            ),
+            "failed_tasks_by_violation": dict(sorted(Counter(
+                violation for row in failures for violation in set(row["violations"])
+            ).items())),
+        },
         "by_family_position": {
             key: _compact_metrics(value) for key, value in sorted(position_groups.items())
         },

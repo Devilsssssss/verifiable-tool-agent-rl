@@ -50,6 +50,15 @@
       "target_order_inspection_rate": 0.7833333333333333
     }
   },
+  "failure_diagnostics": {
+    "failed_tasks": 62,
+    "failed_without_target_inspection": 23,
+    "failed_with_correct_terminal_state": 0,
+    "failed_tasks_by_violation": {
+      "return_window_closed": 58,
+      "step_limit": 58
+    }
+  },
   "by_family_position": {
     "return_eligible/position_1": {
       "tasks": 30,
