@@ -1,0 +1,716 @@
+{
+  "overall": {
+    "tasks": 120,
+    "baseline_successes": 54,
+    "candidate_successes": 81,
+    "gained_tasks": 31,
+    "lost_tasks": 4,
+    "candidate_failed_with_correct_terminal_state": 30,
+    "candidate_failed_without_target_inspection": 8,
+    "candidate_failure_signatures": {
+      "none": 13,
+      "return_window_closed": 26
+    }
+  },
+  "by_stratum": {
+    "overall": {
+      "tasks": 120,
+      "baseline_successes": 54,
+      "candidate_successes": 81,
+      "gained_tasks": 31,
+      "lost_tasks": 4,
+      "candidate_failed_with_correct_terminal_state": 30,
+      "candidate_failed_without_target_inspection": 8,
+      "candidate_failure_signatures": {
+        "none": 13,
+        "return_window_closed": 26
+      }
+    },
+    "return_eligible/position_1": {
+      "tasks": 30,
+      "baseline_successes": 22,
+      "candidate_successes": 23,
+      "gained_tasks": 5,
+      "lost_tasks": 4,
+      "candidate_failed_with_correct_terminal_state": 0,
+      "candidate_failed_without_target_inspection": 0,
+      "candidate_failure_signatures": {
+        "none": 7
+      }
+    },
+    "return_eligible/position_2": {
+      "tasks": 30,
+      "baseline_successes": 24,
+      "candidate_successes": 29,
+      "gained_tasks": 5,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 0,
+      "candidate_failed_without_target_inspection": 1,
+      "candidate_failure_signatures": {
+        "none": 1
+      }
+    },
+    "return_eligible/target_age_1": {
+      "tasks": 20,
+      "baseline_successes": 15,
+      "candidate_successes": 19,
+      "gained_tasks": 4,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 0,
+      "candidate_failed_without_target_inspection": 0,
+      "candidate_failure_signatures": {
+        "none": 1
+      }
+    },
+    "return_eligible/target_age_29": {
+      "tasks": 20,
+      "baseline_successes": 13,
+      "candidate_successes": 14,
+      "gained_tasks": 4,
+      "lost_tasks": 3,
+      "candidate_failed_with_correct_terminal_state": 0,
+      "candidate_failed_without_target_inspection": 1,
+      "candidate_failure_signatures": {
+        "none": 6
+      }
+    },
+    "return_eligible/target_age_30": {
+      "tasks": 20,
+      "baseline_successes": 18,
+      "candidate_successes": 19,
+      "gained_tasks": 2,
+      "lost_tasks": 1,
+      "candidate_failed_with_correct_terminal_state": 0,
+      "candidate_failed_without_target_inspection": 0,
+      "candidate_failure_signatures": {
+        "none": 1
+      }
+    },
+    "return_expired/position_1": {
+      "tasks": 30,
+      "baseline_successes": 8,
+      "candidate_successes": 29,
+      "gained_tasks": 21,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 1,
+      "candidate_failed_without_target_inspection": 0,
+      "candidate_failure_signatures": {
+        "return_window_closed": 1
+      }
+    },
+    "return_expired/position_2": {
+      "tasks": 30,
+      "baseline_successes": 0,
+      "candidate_successes": 0,
+      "gained_tasks": 0,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 29,
+      "candidate_failed_without_target_inspection": 7,
+      "candidate_failure_signatures": {
+        "none": 5,
+        "return_window_closed": 25
+      }
+    },
+    "return_expired/target_age_31": {
+      "tasks": 20,
+      "baseline_successes": 2,
+      "candidate_successes": 9,
+      "gained_tasks": 7,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 11,
+      "candidate_failed_without_target_inspection": 2,
+      "candidate_failure_signatures": {
+        "none": 2,
+        "return_window_closed": 9
+      }
+    },
+    "return_expired/target_age_32": {
+      "tasks": 20,
+      "baseline_successes": 4,
+      "candidate_successes": 10,
+      "gained_tasks": 6,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 9,
+      "candidate_failed_without_target_inspection": 2,
+      "candidate_failure_signatures": {
+        "none": 2,
+        "return_window_closed": 8
+      }
+    },
+    "return_expired/target_age_60": {
+      "tasks": 20,
+      "baseline_successes": 2,
+      "candidate_successes": 10,
+      "gained_tasks": 8,
+      "lost_tasks": 0,
+      "candidate_failed_with_correct_terminal_state": 10,
+      "candidate_failed_without_target_inspection": 3,
+      "candidate_failure_signatures": {
+        "none": 1,
+        "return_window_closed": 9
+      }
+    }
+  },
+  "failure_examples": {
+    "gained": [
+      {
+        "task_id": "return-holdout-return_eligible-0000-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 30,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0046-target-position-2",
+        "family": "return_eligible",
+        "position": 2,
+        "target_age": 29,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0052-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 1,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0054-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 1,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0060-target-position-2",
+        "family": "return_eligible",
+        "position": 2,
+        "target_age": 29,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0062-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 1,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0072-target-position-2",
+        "family": "return_eligible",
+        "position": 2,
+        "target_age": 29,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0086-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 30,
+        "baseline_success": false,
+        "candidate_success": true,
+        "gained": true,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      }
+    ],
+    "lost": [
+      {
+        "task_id": "return-holdout-return_eligible-0044-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 29,
+        "baseline_success": true,
+        "candidate_success": false,
+        "gained": false,
+        "lost": true,
+        "candidate_terminal": false,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0056-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 30,
+        "baseline_success": true,
+        "candidate_success": false,
+        "gained": false,
+        "lost": true,
+        "candidate_terminal": false,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0078-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 29,
+        "baseline_success": true,
+        "candidate_success": false,
+        "gained": false,
+        "lost": true,
+        "candidate_terminal": false,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_eligible-0082-target-position-1",
+        "family": "return_eligible",
+        "position": 1,
+        "target_age": 29,
+        "baseline_success": true,
+        "candidate_success": false,
+        "gained": false,
+        "lost": true,
+        "candidate_terminal": false,
+        "candidate_target_inspected": true,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      }
+    ],
+    "candidate_failed_with_correct_terminal_state": [
+      {
+        "task_id": "return-holdout-return_expired-0003-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 32,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0007-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 60,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0011-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 32,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0017-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 31,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0019-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 31,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0021-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 60,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0025-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 32,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0027-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 32,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": true,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      }
+    ],
+    "candidate_failed_without_target_inspection": [
+      {
+        "task_id": "return-holdout-return_eligible-0074-target-position-2",
+        "family": "return_eligible",
+        "position": 2,
+        "target_age": 29,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": false,
+        "candidate_target_inspected": false,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0031-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 32,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": false,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0047-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 60,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": false,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0053-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 32,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": false,
+        "candidate_target_inspected": false,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "issue_refund"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0065-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 31,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": false,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0067-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 60,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": false,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0113-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 31,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": false,
+        "candidate_signature": "none",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "escalate_to_human"
+        ]
+      },
+      {
+        "task_id": "return-holdout-return_expired-0115-target-position-2",
+        "family": "return_expired",
+        "position": 2,
+        "target_age": 60,
+        "baseline_success": false,
+        "candidate_success": false,
+        "gained": false,
+        "lost": false,
+        "candidate_terminal": true,
+        "candidate_target_inspected": false,
+        "candidate_signature": "return_window_closed",
+        "candidate_tools": [
+          "lookup_user",
+          "list_orders",
+          "get_order",
+          "request_return",
+          "escalate_to_human"
+        ]
+      }
+    ]
+  },
+  "scope": "Descriptive task-level failure analysis. It summarizes saved model outputs and does not select training data, checkpoints, or hyperparameters."
+}

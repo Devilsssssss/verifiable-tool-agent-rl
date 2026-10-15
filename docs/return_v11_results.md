@@ -33,6 +33,28 @@ Both seeds regress on the older five-family confirmation set. This set is a
 regression check, not a fresh blind test, but the result prevents claiming a
 general capability improvement from the age-distribution intervention.
 
+## Failure analysis
+
+The saved trajectories were summarized with
+`scripts/analyze_failure_deltas.py`; the four JSON reports are the corresponding
+`artifacts/return-v11-*-failure-deltas.summary.json` files. The main patterns
+are:
+
+- Seed 45 repeats `request_return` after the return window is closed: 58/120
+  candidate failures contain both `return_window_closed` and `step_limit`.
+  The candidate fails to inspect the target order on 16/64 failures.
+- Seed 46 fixes the expired-return, position-1 cell (29/30 strict successes),
+  but still gets 0/30 at expired-return, position 2. In that cell, 29/30
+  episodes reach the correct terminal state but remain strict failures because
+  a policy violation occurred; 7/30 also fail to inspect the target.
+- On the old confirmation regression, seed 46 has 12 failures with a correct
+  terminal state but a policy violation. This explains why terminal completion
+  alone would overstate the improvement.
+
+The failure report keeps task IDs, target age/position, violation signatures,
+and candidate tool sequences for a small set of examples. It does not copy
+model outputs into training data or choose a checkpoint.
+
 ## Interpretation
 
 The intervention changed return target and distractor ages together while
