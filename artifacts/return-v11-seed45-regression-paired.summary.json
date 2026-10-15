@@ -1,0 +1,204 @@
+{
+  "paired_comparison": {
+    "baseline": "artifacts/v10-position-v10-confirmation-120.jsonl",
+    "candidate": "artifacts/return-v11-seed45-regression.jsonl",
+    "paired_tasks": 120,
+    "protocol": {
+      "tasks_sha256": "4b641d51df65cdb065a1d4f7882f1e973c0c9c38d598e448165d2ff4dca268ae",
+      "limit": 120,
+      "seed": 42,
+      "temperature": 0.0,
+      "max_new_tokens": 512,
+      "input_format": "canonical-v4",
+      "scoring_protocol": "strict-v2-target-inspection",
+      "input_intervention": "explicit-email-field-v1"
+    },
+    "baseline_successes": 105,
+    "candidate_successes": 96,
+    "gained_tasks": 2,
+    "lost_tasks": 11,
+    "strict_success_difference": -0.075,
+    "paired_bootstrap_95_interval": [
+      -0.13333333333333333,
+      -0.016666666666666666
+    ],
+    "bootstrap_seed": 42,
+    "bootstrap_resamples": 5000,
+    "scope": "Exploratory paired task bootstrap; tasks share synthetic templates. Does not quantify model-training seed variability or establish causality. A degenerate all-zero interval is not evidence of population equivalence. Comparisons with an input intervention are valid only within that same intervention."
+  },
+  "position_analysis": {
+    "strata": {
+      "cancel_processing/position_1": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 12,
+        "candidate_success_rate": 1.0,
+        "gained_tasks": 0,
+        "lost_tasks": 0,
+        "success_rate_difference": 0.0
+      },
+      "cancel_processing/position_2": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 12,
+        "candidate_success_rate": 1.0,
+        "gained_tasks": 0,
+        "lost_tasks": 0,
+        "success_rate_difference": 0.0
+      },
+      "cancel_shipped/position_1": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 12,
+        "candidate_success_rate": 1.0,
+        "gained_tasks": 0,
+        "lost_tasks": 0,
+        "success_rate_difference": 0.0
+      },
+      "cancel_shipped/position_2": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 12,
+        "candidate_success_rate": 1.0,
+        "gained_tasks": 0,
+        "lost_tasks": 0,
+        "success_rate_difference": 0.0
+      },
+      "exchange_cheaper/position_1": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 12,
+        "candidate_success_rate": 1.0,
+        "gained_tasks": 0,
+        "lost_tasks": 0,
+        "success_rate_difference": 0.0
+      },
+      "exchange_cheaper/position_2": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 12,
+        "candidate_success_rate": 1.0,
+        "gained_tasks": 0,
+        "lost_tasks": 0,
+        "success_rate_difference": 0.0
+      },
+      "overall": {
+        "tasks": 120,
+        "baseline_successes": 105,
+        "baseline_success_rate": 0.875,
+        "candidate_successes": 96,
+        "candidate_success_rate": 0.8,
+        "gained_tasks": 2,
+        "lost_tasks": 11,
+        "success_rate_difference": -0.075
+      },
+      "position_1": {
+        "tasks": 60,
+        "baseline_successes": 58,
+        "baseline_success_rate": 0.9666666666666667,
+        "candidate_successes": 51,
+        "candidate_success_rate": 0.85,
+        "gained_tasks": 0,
+        "lost_tasks": 7,
+        "success_rate_difference": -0.11666666666666667
+      },
+      "position_2": {
+        "tasks": 60,
+        "baseline_successes": 47,
+        "baseline_success_rate": 0.7833333333333333,
+        "candidate_successes": 45,
+        "candidate_success_rate": 0.75,
+        "gained_tasks": 2,
+        "lost_tasks": 4,
+        "success_rate_difference": -0.03333333333333333
+      },
+      "return_eligible/position_1": {
+        "tasks": 12,
+        "baseline_successes": 10,
+        "baseline_success_rate": 0.8333333333333334,
+        "candidate_successes": 4,
+        "candidate_success_rate": 0.3333333333333333,
+        "gained_tasks": 0,
+        "lost_tasks": 6,
+        "success_rate_difference": -0.5
+      },
+      "return_eligible/position_2": {
+        "tasks": 12,
+        "baseline_successes": 8,
+        "baseline_success_rate": 0.6666666666666666,
+        "candidate_successes": 9,
+        "candidate_success_rate": 0.75,
+        "gained_tasks": 2,
+        "lost_tasks": 1,
+        "success_rate_difference": 0.08333333333333333
+      },
+      "return_expired/position_1": {
+        "tasks": 12,
+        "baseline_successes": 12,
+        "baseline_success_rate": 1.0,
+        "candidate_successes": 11,
+        "candidate_success_rate": 0.9166666666666666,
+        "gained_tasks": 0,
+        "lost_tasks": 1,
+        "success_rate_difference": -0.08333333333333333
+      },
+      "return_expired/position_2": {
+        "tasks": 12,
+        "baseline_successes": 3,
+        "baseline_success_rate": 0.25,
+        "candidate_successes": 0,
+        "candidate_success_rate": 0.0,
+        "gained_tasks": 0,
+        "lost_tasks": 3,
+        "success_rate_difference": -0.25
+      }
+    },
+    "position_effect": {
+      "baseline_position_2_minus_1": -0.18333333333333335,
+      "candidate_position_2_minus_1": -0.09999999999999998
+    },
+    "scope": "Descriptive stratified results from one deterministic decoding run. They measure task-level position sensitivity, not training-seed variability.",
+    "target_order_selection": {
+      "baseline": {
+        "overall": {
+          "tasks": 120,
+          "target_order_selections": 120,
+          "target_order_selection_rate": 1.0
+        },
+        "position_1": {
+          "tasks": 60,
+          "target_order_selections": 60,
+          "target_order_selection_rate": 1.0
+        },
+        "position_2": {
+          "tasks": 60,
+          "target_order_selections": 60,
+          "target_order_selection_rate": 1.0
+        }
+      },
+      "candidate": {
+        "overall": {
+          "tasks": 120,
+          "target_order_selections": 113,
+          "target_order_selection_rate": 0.9416666666666667
+        },
+        "position_1": {
+          "tasks": 60,
+          "target_order_selections": 58,
+          "target_order_selection_rate": 0.9666666666666667
+        },
+        "position_2": {
+          "tasks": 60,
+          "target_order_selections": 55,
+          "target_order_selection_rate": 0.9166666666666666
+        }
+      }
+    }
+  }
+}
