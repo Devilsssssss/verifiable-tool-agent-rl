@@ -1,0 +1,78 @@
+{
+  "status": "frozen-before-model-evaluation",
+  "seed": 20261030,
+  "id_offset": 50000000,
+  "source_generated_tasks": 300,
+  "tasks": 120,
+  "family_counts": {
+    "return_eligible": 60,
+    "return_expired": 60
+  },
+  "position_counts": {
+    "1": 60,
+    "2": 60
+  },
+  "family_position_counts": {
+    "return_eligible": {
+      "1": 30,
+      "2": 30
+    },
+    "return_expired": {
+      "1": 30,
+      "2": 30
+    }
+  },
+  "age_position_cells": {
+    "return_eligible/position_1/target_1/distractor_45": 5,
+    "return_eligible/position_1/target_1/distractor_8": 5,
+    "return_eligible/position_1/target_29/distractor_45": 5,
+    "return_eligible/position_1/target_29/distractor_8": 5,
+    "return_eligible/position_1/target_30/distractor_45": 5,
+    "return_eligible/position_1/target_30/distractor_8": 5,
+    "return_eligible/position_2/target_1/distractor_45": 5,
+    "return_eligible/position_2/target_1/distractor_8": 5,
+    "return_eligible/position_2/target_29/distractor_45": 5,
+    "return_eligible/position_2/target_29/distractor_8": 5,
+    "return_eligible/position_2/target_30/distractor_45": 5,
+    "return_eligible/position_2/target_30/distractor_8": 5,
+    "return_expired/position_1/target_31/distractor_45": 5,
+    "return_expired/position_1/target_31/distractor_8": 5,
+    "return_expired/position_1/target_32/distractor_45": 5,
+    "return_expired/position_1/target_32/distractor_8": 5,
+    "return_expired/position_1/target_60/distractor_45": 5,
+    "return_expired/position_1/target_60/distractor_8": 5,
+    "return_expired/position_2/target_31/distractor_45": 5,
+    "return_expired/position_2/target_31/distractor_8": 5,
+    "return_expired/position_2/target_32/distractor_45": 5,
+    "return_expired/position_2/target_32/distractor_8": 5,
+    "return_expired/position_2/target_60/distractor_45": 5,
+    "return_expired/position_2/target_60/distractor_8": 5
+  },
+  "audit": {
+    "tasks": 1020,
+    "split_counts": {
+      "confirmation": 120,
+      "return-holdout": 120,
+      "test": 120,
+      "train": 600,
+      "validation": 60
+    },
+    "family_counts": {
+      "cancel_processing": 180,
+      "cancel_shipped": 180,
+      "exchange_cheaper": 180,
+      "return_eligible": 240,
+      "return_expired": 240
+    },
+    "expert_successes": 1020,
+    "noop_successes": 0,
+    "direct_shortcut_successes": 0,
+    "mean_expert_shaped_reward": 1.4000000000000001,
+    "entity_overlap_across_splits": 0,
+    "task_sha256": "f248503064962165808acd9ecd6e330a04093703b67ab6d8c45eeb83a33b22c2",
+    "status": "pass"
+  },
+  "file_sha256": "c8e70024ca2b0ae69e8754a60e0ecbf32d11e1a66cb1bec3275c82a70d3282e3",
+  "selection_policy": "Freeze before evaluating any candidate adapter; do not tune on outcomes.",
+  "scope": "Fresh return-policy templates, entities and IDs; target position balanced within each family."
+}
