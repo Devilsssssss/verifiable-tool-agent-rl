@@ -11,9 +11,11 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
+from toolrl.environment import SCORING_PROTOCOL
 from toolrl.io import load_tasks, read_jsonl
 from toolrl.metrics import summarize_reports
 from toolrl.position_shift import target_order_position
+from toolrl.return_holdout import RETURN_FAMILIES
 
 
 def main() -> int:
@@ -25,9 +27,21 @@ def main() -> int:
 
     tasks = load_tasks(args.tasks)
     task_index = {task.task_id: task for task in tasks}
+    if len(task_index) != len(tasks):
+        raise ValueError("task file contains duplicate task IDs")
+    if any(task.family not in RETURN_FAMILIES for task in tasks):
+        raise ValueError("return holdout must contain only return tasks")
     rows = read_jsonl(args.rollouts)
-    if set(task_index) != {str(row["task_id"]) for row in rows}:
-        raise ValueError("tasks and rollouts must contain identical task IDs")
+    _validate_rollouts(rows, task_index)
+    source = json.loads(args.rollouts.with_suffix(".summary.json").read_text(encoding="utf-8"))
+    digest = hashlib.sha256(args.tasks.read_bytes()).hexdigest()
+    if source.get("tasks_sha256") != digest:
+        raise ValueError("rollout summary tasks_sha256 does not match the supplied task file")
+    for key in ("run_name", "scoring_protocol", "input_intervention"):
+        if source.get(key) != rows[0][key]:
+            raise ValueError(f"rollout summary and rows disagree on {key}")
+    if source.get("overall", {}).get("tasks") != len(rows):
+        raise ValueError("rollout summary and rows disagree on task count")
 
     reports = []
     wrong_email_tasks = 0
@@ -37,7 +51,7 @@ def main() -> int:
         wrong_email = any(
             step["tool"] == "lookup_user"
             and step["arguments"].get("email") != expected_email
-            for step in row.get("trace", [])
+            for step in row["trace"]
         )
         wrong_email_tasks += wrong_email
         target_age = next(
@@ -55,16 +69,16 @@ def main() -> int:
             }
         )
 
-    groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    position_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    age_groups: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for row in reports:
-        groups["overall"].append(row)
-        groups[f"{row['family']}/position_{row['target_position']}"].append(row)
-        groups[f"{row['family']}/target_age_{row['target_age']}"] .append(row)
+        position_groups[f"{row['family']}/position_{row['target_position']}"].append(row)
+        age_groups[f"{row['family']}/target_age_{row['target_age']}"].append(row)
 
     summary = {
         "run_name": rows[0].get("run_name") if rows else None,
         "rollouts": len(rows),
-        "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
+        "tasks_sha256": digest,
         "rollouts_path": str(args.rollouts),
         "scoring_protocol": rows[0].get("scoring_protocol") if rows else None,
         "input_intervention": rows[0].get("input_intervention", "original") if rows else None,
@@ -72,17 +86,56 @@ def main() -> int:
         "overall": summarize_reports(reports)["overall"],
         "by_family": summarize_reports(reports)["by_family"],
         "by_family_position": {
-            key: _compact_metrics(value) for key, value in sorted(groups.items()) if key != "overall"
+            key: _compact_metrics(value) for key, value in sorted(position_groups.items())
+        },
+        "by_family_target_age": {
+            key: _compact_metrics(value) for key, value in sorted(age_groups.items())
         },
         "scope": (
-            "Descriptive analysis of the frozen return holdout. No outcome was used to alter "
-            "the holdout, prompts, decoding or training data."
+            "Descriptive analysis of the frozen return holdout; see "
+            "docs/return_boundary_protocol.md for experiment timing and interpretation limits."
         ),
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
     return 0
+
+
+def _validate_rollouts(rows: list[dict[str, Any]], task_index: dict[str, Any]) -> None:
+    if not rows:
+        raise ValueError("rollouts must not be empty")
+    ids = []
+    for row in rows:
+        if not isinstance(row, dict) or "task_id" not in row:
+            raise ValueError("every rollout must be an object with task_id")
+        task_id = str(row["task_id"])
+        ids.append(task_id)
+        missing = {
+            "success", "policy_compliant", "trace", "target_order_inspected",
+            "terminal_goal_satisfied", "family",
+        } - row.keys()
+        if missing:
+            raise ValueError(f"rollout {task_id} is missing fields: {sorted(missing)}")
+        if not isinstance(row["trace"], list):
+            raise TypeError(f"rollout {task_id} trace must be a list")
+        if task_id in task_index and row["family"] != task_index[task_id].family:
+            raise ValueError(f"rollout {task_id} family disagrees with task file")
+    if len(ids) != len(set(ids)):
+        raise ValueError("rollouts must contain each task ID exactly once")
+    if set(task_index) != set(ids):
+        missing = sorted(set(task_index) - set(ids))
+        extra = sorted(set(ids) - set(task_index))
+        raise ValueError(
+            f"tasks and rollouts must contain identical task IDs; missing={missing}, extra={extra}"
+        )
+
+    for field in ("run_name", "scoring_protocol", "input_intervention"):
+        values = {row.get(field, "<missing>") for row in rows}
+        if len(values) != 1 or "<missing>" in values:
+            raise ValueError(f"rollouts must use one complete {field} value")
+    if rows[0]["scoring_protocol"] != SCORING_PROTOCOL:
+        raise ValueError(f"return analysis requires scoring protocol {SCORING_PROTOCOL}")
 
 
 def _compact_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
@@ -92,10 +145,10 @@ def _compact_metrics(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "task_successes": sum(bool(row["success"]) for row in rows),
         "task_success_rate": sum(bool(row["success"]) for row in rows) / count,
         "policy_compliance_rate": sum(bool(row["policy_compliant"]) for row in rows) / count,
-        "target_inspection_rate": sum(bool(row.get("target_order_inspected", False)) for row in rows)
+        "target_inspection_rate": sum(bool(row["target_order_inspected"]) for row in rows)
         / count,
         "terminal_goal_completion_rate": sum(
-            bool(row.get("terminal_goal_satisfied", False)) for row in rows
+            bool(row["terminal_goal_satisfied"]) for row in rows
         )
         / count,
         "wrong_email_tasks": sum(bool(row["wrong_email"]) for row in rows),

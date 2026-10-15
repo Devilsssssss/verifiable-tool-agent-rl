@@ -1,5 +1,7 @@
+import importlib.util
 from collections import Counter
 from copy import deepcopy
+from pathlib import Path
 
 import pytest
 
@@ -12,6 +14,48 @@ from toolrl.return_holdout import (
     build_return_holdout,
     vary_return_days,
 )
+
+
+def test_return_analysis_rejects_duplicate_and_mixed_protocol_rows() -> None:
+    module_path = Path(__file__).parents[1] / "scripts" / "analyze_return_holdout.py"
+    spec = importlib.util.spec_from_file_location("analyze_return_holdout", module_path)
+    module = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(module)
+    validate_rollouts = module._validate_rollouts
+
+    tasks = [task for task in generate_tasks({"test": 10}, seed=97)
+             if task.family in RETURN_FAMILIES]
+    # The helper is intentionally tested independently of model output parsing.
+    tasks = tasks[:2]
+    task_index = {task.task_id: task for task in tasks}
+    row = {
+        "task_id": tasks[0].task_id,
+        "success": False,
+        "policy_compliant": False,
+        "trace": [],
+        "family": tasks[0].family,
+        "target_order_inspected": False,
+        "terminal_goal_satisfied": False,
+        "run_name": "run-a",
+        "scoring_protocol": "strict-v2-target-inspection",
+        "input_intervention": "explicit-email-field-v1",
+    }
+    with pytest.raises(ValueError, match="exactly once"):
+        validate_rollouts([row, deepcopy(row)], task_index)
+    row2 = deepcopy(row)
+    row2["task_id"] = tasks[1].task_id
+    row2["family"] = tasks[1].family
+    row2["run_name"] = "run-b"
+    with pytest.raises(ValueError, match="one complete run_name"):
+        validate_rollouts([row, row2], task_index)
+    row2["run_name"] = "run-a"
+    validate_rollouts([row, row2], task_index)
+    with pytest.raises(ValueError, match="identical task IDs"):
+        validate_rollouts([row], task_index)
+    del row2["target_order_inspected"]
+    with pytest.raises(ValueError, match="missing fields"):
+        validate_rollouts([row, row2], task_index)
 
 
 def test_boundary_holdout_preserves_expert_correctness_and_entity_isolation() -> None:

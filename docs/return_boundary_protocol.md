@@ -30,7 +30,7 @@ Record strict success by family and target position, target-order inspection, wr
 
 ## Optional training intervention
 
-Only after the three baseline runs are archived, create `return-v11` from the existing position-v10 training tasks. The intervention changes only return target/distractor delivery ages:
+Train `return-v11` only after all three baseline runs have completed and their trajectories have been replayed. The age schedule was specified before baseline outcomes; the deterministic training files were materialized while baselines were still running, without inspecting or selecting holdout examples. This corrects the earlier wording that placed data-file generation after baseline archival; training has not started at this protocol update. Create `return-v11` from the existing position-v10 training tasks. The intervention changes only return target/distractor delivery ages:
 
 - eligible target ages: 2, 14, 28 days;
 - expired target ages: 33, 46, 75 days;
@@ -38,6 +38,12 @@ Only after the three baseline runs are archived, create `return-v11` from the ex
 
 Task identities, prompts, family/position balance, lookup views, view counts, and training code remain unchanged. The resulting run is an equal-view data-distribution intervention, not a new RL algorithm. It must be evaluated on the already frozen holdout with the same decoding and strictness settings.
 
+Before starting candidate training, fix two paired training seeds: **45 and 46**. Both start from the base Qwen3-1.7B model (not a v10 adapter), use the same 900 views, one epoch, learning rate `2e-4`, batch size 1, gradient accumulation 8, maximum length 4096, and the existing LoRA settings (rank 16, alpha 32, dropout 0.05, all linear layers). Keep the final adapter; validation loss does not select a checkpoint. No further candidate hyperparameter search is part of this experiment.
+
+Evaluate both final adapters on the frozen 120-task return holdout and the existing 120-task position confirmation set. Compare each with its matched v10 seed, report paired gains/losses and every family/position cell, and replay all candidate trajectories. The old confirmation set is a regression check, not a new blind test. Report either seed even if it loses; do not select the better seed for the headline.
+
 ## Interpretation
 
 Do not claim that GRPO or RL improves performance unless a separately controlled RL experiment shows a reproducible gain. If v10 fails on the frozen boundary set, report the failure mode and compare v11 only as a supervised data-distribution intervention. A gain must be reported together with family/position breakdowns and the exact frozen holdout digest.
+
+The new holdout changes wording, entities, and delivery ages together; the drop from old confirmation scores cannot be attributed solely to age. The v11 intervention changes both target and distractor age distributions, so it tests their combined effect and does not isolate which caused any improvement. Training view/update counts are fixed, but token lengths need not be identical.

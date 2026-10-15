@@ -1,0 +1,148 @@
+{
+  "run_name": "return-holdout-v10-seed45",
+  "rollouts": 120,
+  "tasks_sha256": "c8e70024ca2b0ae69e8754a60e0ecbf32d11e1a66cb1bec3275c82a70d3282e3",
+  "rollouts_path": "artifacts\\return-holdout-seed45.jsonl",
+  "scoring_protocol": "strict-v2-target-inspection",
+  "input_intervention": "explicit-email-field-v1",
+  "wrong_email_tasks": 0,
+  "overall": {
+    "tasks": 120,
+    "task_success": 0.48333333333333334,
+    "policy_compliance": 0.5166666666666667,
+    "mean_valid_tool_rate": 0.6616666666666667,
+    "mean_steps": 7.35,
+    "mean_progress": 0.8616666666666667,
+    "mean_shaped_reward": 0.5075000000000001,
+    "terminal_goal_completion": 0.48333333333333334,
+    "format_error_tasks": 0,
+    "format_recovery_successes": 0,
+    "format_recovery_rate": null,
+    "target_order_inspection_rate": 0.8083333333333333
+  },
+  "by_family": {
+    "return_eligible": {
+      "tasks": 60,
+      "task_success": 0.8333333333333334,
+      "policy_compliance": 0.85,
+      "mean_valid_tool_rate": 0.895,
+      "mean_steps": 5.75,
+      "mean_progress": 0.94,
+      "mean_shaped_reward": 1.1105000000000003,
+      "terminal_goal_completion": 0.8333333333333334,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.8333333333333334
+    },
+    "return_expired": {
+      "tasks": 60,
+      "task_success": 0.13333333333333333,
+      "policy_compliance": 0.18333333333333332,
+      "mean_valid_tool_rate": 0.42833333333333334,
+      "mean_steps": 8.95,
+      "mean_progress": 0.7833333333333333,
+      "mean_shaped_reward": -0.09549999999999989,
+      "terminal_goal_completion": 0.13333333333333333,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.7833333333333333
+    }
+  },
+  "by_family_position": {
+    "return_eligible/position_1": {
+      "tasks": 30,
+      "task_successes": 26,
+      "task_success_rate": 0.8666666666666667,
+      "policy_compliance_rate": 0.8666666666666667,
+      "target_inspection_rate": 0.8666666666666667,
+      "terminal_goal_completion_rate": 0.8666666666666667,
+      "wrong_email_tasks": 0
+    },
+    "return_eligible/position_2": {
+      "tasks": 30,
+      "task_successes": 24,
+      "task_success_rate": 0.8,
+      "policy_compliance_rate": 0.8333333333333334,
+      "target_inspection_rate": 0.8,
+      "terminal_goal_completion_rate": 0.8,
+      "wrong_email_tasks": 0
+    },
+    "return_expired/position_1": {
+      "tasks": 30,
+      "task_successes": 6,
+      "task_success_rate": 0.2,
+      "policy_compliance_rate": 0.23333333333333334,
+      "target_inspection_rate": 0.8666666666666667,
+      "terminal_goal_completion_rate": 0.2,
+      "wrong_email_tasks": 0
+    },
+    "return_expired/position_2": {
+      "tasks": 30,
+      "task_successes": 2,
+      "task_success_rate": 0.06666666666666667,
+      "policy_compliance_rate": 0.13333333333333333,
+      "target_inspection_rate": 0.7,
+      "terminal_goal_completion_rate": 0.06666666666666667,
+      "wrong_email_tasks": 0
+    }
+  },
+  "by_family_target_age": {
+    "return_eligible/target_age_1": {
+      "tasks": 20,
+      "task_successes": 15,
+      "task_success_rate": 0.75,
+      "policy_compliance_rate": 0.75,
+      "target_inspection_rate": 0.75,
+      "terminal_goal_completion_rate": 0.75,
+      "wrong_email_tasks": 0
+    },
+    "return_eligible/target_age_29": {
+      "tasks": 20,
+      "task_successes": 15,
+      "task_success_rate": 0.75,
+      "policy_compliance_rate": 0.8,
+      "target_inspection_rate": 0.75,
+      "terminal_goal_completion_rate": 0.75,
+      "wrong_email_tasks": 0
+    },
+    "return_eligible/target_age_30": {
+      "tasks": 20,
+      "task_successes": 20,
+      "task_success_rate": 1.0,
+      "policy_compliance_rate": 1.0,
+      "target_inspection_rate": 1.0,
+      "terminal_goal_completion_rate": 1.0,
+      "wrong_email_tasks": 0
+    },
+    "return_expired/target_age_31": {
+      "tasks": 20,
+      "task_successes": 2,
+      "task_success_rate": 0.1,
+      "policy_compliance_rate": 0.2,
+      "target_inspection_rate": 0.9,
+      "terminal_goal_completion_rate": 0.1,
+      "wrong_email_tasks": 0
+    },
+    "return_expired/target_age_32": {
+      "tasks": 20,
+      "task_successes": 4,
+      "task_success_rate": 0.2,
+      "policy_compliance_rate": 0.25,
+      "target_inspection_rate": 0.85,
+      "terminal_goal_completion_rate": 0.2,
+      "wrong_email_tasks": 0
+    },
+    "return_expired/target_age_60": {
+      "tasks": 20,
+      "task_successes": 2,
+      "task_success_rate": 0.1,
+      "policy_compliance_rate": 0.1,
+      "target_inspection_rate": 0.6,
+      "terminal_goal_completion_rate": 0.1,
+      "wrong_email_tasks": 0
+    }
+  },
+  "scope": "Descriptive analysis of the frozen return holdout; see docs/return_boundary_protocol.md for experiment timing and interpretation limits."
+}

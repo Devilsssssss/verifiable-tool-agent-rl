@@ -1,0 +1,59 @@
+{
+  "scoring_context": "unaided",
+  "input_intervention": "explicit-email-field-v1",
+  "rollouts": "artifacts\\return-holdout-seed45.jsonl",
+  "tasks": "data\\return-holdout\\tasks_test.jsonl",
+  "scoring_protocol": "strict-v2-target-inspection",
+  "replay_verified": 120,
+  "original_scores_unchanged": true,
+  "wrong_email_tasks": 0,
+  "definition": {
+    "task_success": "Strict success: correct terminal state, no violations, and the target order was inspected.",
+    "terminal_goal_completion": "Correct terminal state, independent of prior violations.",
+    "format_recovery_rate": "Correct terminal state with only invalid_tool_call violations, divided by episodes containing invalid_tool_call. Other policy violations remain disqualifying."
+  },
+  "overall": {
+    "tasks": 120,
+    "task_success": 0.48333333333333334,
+    "policy_compliance": 0.5166666666666667,
+    "mean_valid_tool_rate": 0.6616666666666667,
+    "mean_steps": 7.35,
+    "mean_progress": 0.8616666666666667,
+    "mean_shaped_reward": 0.5075000000000001,
+    "terminal_goal_completion": 0.48333333333333334,
+    "format_error_tasks": 0,
+    "format_recovery_successes": 0,
+    "format_recovery_rate": null,
+    "target_order_inspection_rate": 0.8083333333333333
+  },
+  "by_family": {
+    "return_eligible": {
+      "tasks": 60,
+      "task_success": 0.8333333333333334,
+      "policy_compliance": 0.85,
+      "mean_valid_tool_rate": 0.895,
+      "mean_steps": 5.75,
+      "mean_progress": 0.94,
+      "mean_shaped_reward": 1.1105000000000003,
+      "terminal_goal_completion": 0.8333333333333334,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.8333333333333334
+    },
+    "return_expired": {
+      "tasks": 60,
+      "task_success": 0.13333333333333333,
+      "policy_compliance": 0.18333333333333332,
+      "mean_valid_tool_rate": 0.42833333333333334,
+      "mean_steps": 8.95,
+      "mean_progress": 0.7833333333333333,
+      "mean_shaped_reward": -0.09549999999999989,
+      "terminal_goal_completion": 0.13333333333333333,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.7833333333333333
+    }
+  }
+}

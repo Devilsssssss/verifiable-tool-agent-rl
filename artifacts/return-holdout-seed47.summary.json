@@ -1,0 +1,58 @@
+{
+  "run_name": "return-holdout-v10-seed47",
+  "model_id": "models/Qwen3-1.7B",
+  "adapter": "outputs/qwen3-1.7b-tool-sft-position-v10-seed47",
+  "seed": 42,
+  "temperature": 0.0,
+  "max_new_tokens": 512,
+  "input_format": "canonical-v4",
+  "input_intervention": "explicit-email-field-v1",
+  "tasks_path": "data/return-holdout/tasks_test.jsonl",
+  "tasks_sha256": "c8e70024ca2b0ae69e8754a60e0ecbf32d11e1a66cb1bec3275c82a70d3282e3",
+  "limit": 120,
+  "scoring_protocol": "strict-v2-target-inspection",
+  "overall": {
+    "tasks": 120,
+    "task_success": 0.38333333333333336,
+    "policy_compliance": 0.9,
+    "mean_valid_tool_rate": 0.98,
+    "mean_steps": 4.275,
+    "mean_progress": 0.8416666666666667,
+    "mean_shaped_reward": 0.7096666666666668,
+    "terminal_goal_completion": 0.6416666666666667,
+    "format_error_tasks": 0,
+    "format_recovery_successes": 0,
+    "format_recovery_rate": null,
+    "target_order_inspection_rate": 0.65
+  },
+  "by_family": {
+    "return_eligible": {
+      "tasks": 60,
+      "task_success": 0.3,
+      "policy_compliance": 0.9833333333333333,
+      "mean_valid_tool_rate": 0.9966666666666666,
+      "mean_steps": 4.35,
+      "mean_progress": 0.7333333333333333,
+      "mean_shaped_reward": 0.6513333333333333,
+      "terminal_goal_completion": 0.3,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.65
+    },
+    "return_expired": {
+      "tasks": 60,
+      "task_success": 0.4666666666666667,
+      "policy_compliance": 0.8166666666666667,
+      "mean_valid_tool_rate": 0.9633333333333333,
+      "mean_steps": 4.2,
+      "mean_progress": 0.95,
+      "mean_shaped_reward": 0.7680000000000001,
+      "terminal_goal_completion": 0.9833333333333333,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.65
+    }
+  }
+}
