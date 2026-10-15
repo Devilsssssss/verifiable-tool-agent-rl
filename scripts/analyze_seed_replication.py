@@ -21,6 +21,7 @@ def main() -> int:
     parser.add_argument("--baseline", type=Path, required=True)
     parser.add_argument("--candidate", action="append", required=True, metavar="LABEL=JSONL")
     parser.add_argument("--manifest", action="append", required=True, metavar="LABEL=JSON")
+    parser.add_argument("--replay", action="append", required=True, metavar="LABEL=JSON")
     parser.add_argument("--required-replication", action="append", required=True)
     parser.add_argument("--position-2-threshold", type=int, default=30)
     parser.add_argument("--output", type=Path, required=True)
@@ -28,8 +29,9 @@ def main() -> int:
 
     candidates = _named_paths(args.candidate)
     manifests = _named_paths(args.manifest)
-    if set(candidates) != set(manifests):
-        raise ValueError("candidate and manifest labels must match")
+    replays = _named_paths(args.replay)
+    if set(candidates) != set(manifests) or set(candidates) != set(replays):
+        raise ValueError("candidate, manifest and replay labels must match")
 
     tasks = load_tasks(args.tasks)
     baseline_rows = read_jsonl(args.baseline)
@@ -39,6 +41,7 @@ def main() -> int:
         paired_comparisons[label] = compare_pair(args.baseline, candidate_path)
         reports[label] = {
             "training_manifest": json.loads(manifests[label].read_text(encoding="utf-8")),
+            "replay_audit": json.loads(replays[label].read_text(encoding="utf-8")),
             "position_analysis": analyze_position_runs(
                 tasks,
                 baseline_rows,
@@ -47,6 +50,9 @@ def main() -> int:
         }
     result = {
         "paired_comparisons": paired_comparisons,
+        "position_analyses": {
+            label: report["position_analysis"] for label, report in reports.items()
+        },
         **summarize_seed_replications(
             reports,
             required_replications=args.required_replication,

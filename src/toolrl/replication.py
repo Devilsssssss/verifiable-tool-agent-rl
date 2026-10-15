@@ -47,6 +47,8 @@ def summarize_seed_replications(
     mismatched = [label for label, signature in signatures.items() if signature != reference]
     if mismatched:
         raise ValueError(f"training configuration mismatch: {mismatched}")
+    if reference["train_samples"] != 900 or reference["optimizer_steps"] != 113:
+        raise ValueError("preregistered training requires 900 views and 113 optimizer steps")
 
     training_seeds = [report["training_manifest"]["seed"] for report in reports.values()]
     if len(training_seeds) != len(set(training_seeds)):
@@ -57,6 +59,13 @@ def summarize_seed_replications(
         analysis = report["position_analysis"]
         strata = analysis["strata"]
         selection = analysis["target_order_selection"]["candidate"]
+        if (
+            strata["overall"]["tasks"] != 120
+            or strata["position_1"]["tasks"] != 60
+            or strata["position_2"]["tasks"] != 60
+        ):
+            raise ValueError("preregistered evaluation requires 120 tasks balanced 60/60")
+        audit = report["replay_audit"]
         entry = {
             "training_seed": report["training_manifest"]["seed"],
             "overall_successes": strata["overall"]["candidate_successes"],
@@ -65,6 +74,12 @@ def summarize_seed_replications(
             "position_2_target_order_selections": selection["position_2"][
                 "target_order_selections"
             ],
+            "replay_verified": audit["replay_verified"],
+            "meets_replay_requirement": (
+                audit["replay_verified"] == 120
+                and audit["original_scores_unchanged"] is True
+                and audit["scoring_protocol"] == "strict-v2-target-inspection"
+            ),
         }
         entry["meets_position_2_threshold"] = (
             entry["position_2_successes"] >= position_2_threshold
@@ -82,6 +97,7 @@ def summarize_seed_replications(
         label: (
             per_seed[label]["meets_position_2_threshold"]
             and per_seed[label]["meets_position_2_selection_requirement"]
+            and per_seed[label]["meets_replay_requirement"]
         )
         for label in required_replications
     }
@@ -100,6 +116,7 @@ def summarize_seed_replications(
             "required_replications": required_replications,
             "position_2_success_threshold": position_2_threshold,
             "position_2_target_order_selection_requirement": 60,
+            "replay_requirement": "120 verified trajectories with unchanged strict-v2 scores",
             "per_replication_pass": required_checks,
             "passed": all(required_checks.values()),
         },
