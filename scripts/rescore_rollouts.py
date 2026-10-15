@@ -8,7 +8,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from toolrl.environment import SCORING_PROTOCOL, RetailToolEnvironment
+from toolrl.environment import (
+    REASON_CODE_SCORING_PROTOCOL,
+    SCORING_PROTOCOL,
+    RetailToolEnvironment,
+)
 from toolrl.expert import reset_environment
 from toolrl.io import load_tasks, read_jsonl, write_jsonl
 from toolrl.metrics import summarize_reports
@@ -19,6 +23,11 @@ def main() -> int:
     parser.add_argument("--tasks", type=Path, required=True)
     parser.add_argument("--rollouts", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--scoring-protocol",
+        choices=(SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL),
+        default=SCORING_PROTOCOL,
+    )
     args = parser.parse_args()
 
     source_summary_path = args.rollouts.with_suffix(".summary.json")
@@ -30,7 +39,7 @@ def main() -> int:
     for record in records:
         task = tasks[record["task_id"]]
         environment = RetailToolEnvironment()
-        reset_environment(environment, task)
+        reset_environment(environment, task, scoring_protocol=args.scoring_protocol)
         for step in record["trace"]:
             if step["violation"] == "invalid_tool_call":
                 environment._record_external_failure(
@@ -47,15 +56,19 @@ def main() -> int:
                 **record,
                 **report,
                 "reward": environment.get_reward(),
-                "scoring_protocol": SCORING_PROTOCOL,
+                "scoring_protocol": args.scoring_protocol,
             }
         )
 
     write_jsonl(args.output, rescored)
     summary = {
         **source_summary,
-        "run_name": f'{source_summary["run_name"]}-strict-v2',
-        "scoring_protocol": SCORING_PROTOCOL,
+        "run_name": (
+            f'{source_summary["run_name"]}-strict-v2'
+            if args.scoring_protocol == SCORING_PROTOCOL
+            else f'{source_summary["run_name"]}-{args.scoring_protocol}'
+        ),
+        "scoring_protocol": args.scoring_protocol,
         "rescored_from": str(args.rollouts),
         "source_scoring_protocol": source_summary["scoring_protocol"],
         "changed_success_labels": changed_successes,

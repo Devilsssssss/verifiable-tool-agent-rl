@@ -8,6 +8,8 @@ from functools import wraps
 from typing import Any
 
 SCORING_PROTOCOL = "strict-v2-target-inspection"
+REASON_CODE_SCORING_PROTOCOL = "strict-v3-reason-code"
+SUPPORTED_SCORING_PROTOCOLS = {SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL}
 
 
 def _drop_null_tool_slots(method):
@@ -53,10 +55,13 @@ class RetailToolEnvironment:
         max_steps: int,
         optimal_steps: int,
         reward_mode: str = "shaped",
+        scoring_protocol: str = SCORING_PROTOCOL,
         **_: Any,
     ) -> None:
         if reward_mode not in {"sparse", "shaped"}:
             raise ValueError(f"unsupported reward mode: {reward_mode}")
+        if scoring_protocol not in SUPPORTED_SCORING_PROTOCOLS:
+            raise ValueError(f"unsupported scoring protocol: {scoring_protocol}")
         if self._connection is not None:
             self._connection.close()
         self._connection = sqlite3.connect(":memory:")
@@ -69,6 +74,7 @@ class RetailToolEnvironment:
         self._max_steps = int(max_steps)
         self._optimal_steps = int(optimal_steps)
         self._reward_mode = reward_mode
+        self._scoring_protocol = scoring_protocol
         self._observed_user_ids = set()
         self._observed_order_ids = set()
         self._inspected_order_ids = set()
@@ -456,7 +462,7 @@ class RetailToolEnvironment:
         )
 
     @_drop_null_tool_slots
-    def escalate_to_human(self, reason: str) -> str:
+    def escalate_to_human(self, reason: str, reason_code: str | None = None) -> str:
         """Escalate a request that cannot be completed under policy.
 
         Args:
@@ -466,11 +472,22 @@ class RetailToolEnvironment:
             A JSON object confirming escalation.
         """
         args = {"reason": reason}
+        if reason_code is not None:
+            args["reason_code"] = reason_code
         if error := self._preflight("escalate_to_human", args):
             return error
         if not self._inspected_order_ids:
             return self._policy_error("escalate_to_human", args, "inspect_order_before_escalation")
-        self._db.execute("INSERT INTO escalations(reason) VALUES (?)", (reason,))
+        if self._scoring_protocol == REASON_CODE_SCORING_PROTOCOL:
+            expected = self._expected_escalation_reason_code()
+            if reason_code != expected:
+                return self._policy_error(
+                    "escalate_to_human", args, "escalation_reason_code_mismatch"
+                )
+        self._db.execute(
+            "INSERT INTO escalations(reason, reason_code) VALUES (?, ?)",
+            (reason, reason_code),
+        )
         self._db.commit()
         return self._finish("escalate_to_human", args, True, {"status": "escalated"}, mutated=True)
 
@@ -593,7 +610,8 @@ class RetailToolEnvironment:
             );
             CREATE TABLE escalations (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                reason TEXT NOT NULL
+                reason TEXT NOT NULL,
+                reason_code TEXT
             );
             """
         )
@@ -614,7 +632,7 @@ class RetailToolEnvironment:
             "order_items": ("order_id", "product_id", "quantity", "unit_price_cents"),
             "refunds": ("id", "order_id", "amount_cents", "payment_method"),
             "returns": ("id", "order_id", "product_id", "quantity", "status"),
-            "escalations": ("id", "reason"),
+            "escalations": ("id", "reason", "reason_code"),
         }
         for table, columns in table_columns.items():
             rows = state.get(table, [])
@@ -740,6 +758,25 @@ class RetailToolEnvironment:
                 == self._state_without_escalations(self._initial_business_state)
             )
         raise ValueError(f"unsupported goal kind: {kind}")
+
+    def _expected_escalation_reason_code(self) -> str | None:
+        order_id = self._goal.get("order_id")
+        if not isinstance(order_id, int):
+            return None
+        order = self._db.execute(
+            "SELECT status, days_since_delivery FROM orders WHERE id = ?", (order_id,)
+        ).fetchone()
+        if order is None:
+            return None
+        if order["status"] == "shipped":
+            return "shipped_order_cannot_cancel"
+        if (
+            order["status"] == "delivered"
+            and order["days_since_delivery"] is not None
+            and int(order["days_since_delivery"]) > 30
+        ):
+            return "return_window_expired"
+        return None
 
     def _correct_prefix_length(self) -> int:
         expected = {

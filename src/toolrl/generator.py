@@ -287,8 +287,19 @@ def _goal_and_plan(
         )
     if family in {"cancel_shipped", "return_expired"}:
         return (
-            {"kind": "escalate_unchanged", "order_id": order_id},
-            inspect + [_step("escalate_to_human", reason=_escalation_reason(family))],
+            {
+                "kind": "escalate_unchanged",
+                "order_id": order_id,
+                "reason_code": _escalation_reason_code(family),
+            },
+            inspect
+            + [
+                _step(
+                    "escalate_to_human",
+                    reason=_escalation_reason(family),
+                    reason_code=_escalation_reason_code(family),
+                )
+            ],
         )
     raise ValueError(f"unsupported family: {family}")
 
@@ -301,6 +312,14 @@ def _escalation_reason(family: str) -> str:
     if family == "cancel_shipped":
         return "The order has shipped and cannot be cancelled with the available tools."
     return "The return window has expired, so the request requires human review."
+
+
+def _escalation_reason_code(family: str) -> str:
+    if family == "cancel_shipped":
+        return "shipped_order_cannot_cancel"
+    if family == "return_expired":
+        return "return_window_expired"
+    raise ValueError(f"unsupported escalation family: {family}")
 
 
 def entity_tokens(tasks: Iterable[AgentTask]) -> set[str]:

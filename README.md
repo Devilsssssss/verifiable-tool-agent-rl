@@ -83,6 +83,8 @@ task outcome + policy compliance + valid tool-call rate + correct-prefix progres
 
 当前严格成功指标会把 `invalid_tool_call`（例如多传参数）也记为违规，即使模型随后纠正了调用并达到目标，严格成功仍为 0。为分析恢复行为，额外报告 `terminal_goal_completion`（仅检查目标数据库终态）和 `format_recovery_rate`（只有格式错误、最终达到目标的任务数 / 出现格式错误的任务数）。存在业务政策违规或超预算的轨迹不能计入格式恢复成功。这两个诊断指标不改变严格成功或训练奖励。
 
+针对升级任务的理由校验已作为独立的 `strict-v3-reason-code` 协议实现，默认评分和历史结果仍是 strict-v2。v3 的设计、兼容性和离线复评分方式见 [reason_code_protocol.md](docs/reason_code_protocol.md)。
+
 ## 数据与审计
 
 固定种子生成 `300/60/120` 条训练、验证和测试任务。三个划分使用不同的 ID、邮箱、商品名称和提示模板；用户显示姓名不在实体重叠审计范围内。`scripts/audit_tasks.py` 会重放所有专家轨迹并检查重复、ID 泄漏、跨划分实体重叠、空操作和直接捷径。

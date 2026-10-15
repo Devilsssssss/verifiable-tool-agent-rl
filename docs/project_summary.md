@@ -28,6 +28,7 @@ v11 的结果不是 RL 增益证据，而是一次预先固定的监督数据分
 - 从失败轨迹定位出模型始终选择列表第一项，并发现旧评分器会把 7 条“检查错误订单后升级”的轨迹判成功；保留旧结果后新增目标订单检查约束并离线重放，避免用评分器修订掩盖原始结果。
 - 对两个等预算 factorial SFT 候选进行止损验证：原始提示协议下均为 `0/20`，因此停止继续扩充同类 SFT，未用奖励改写、解析器修补或确认集反向选模掩盖负结果。
 - 对 return-v11 两个训练 seed 做冻结 holdout 与旧确认集的 task-level gained/lost 分析；新增 `scripts/analyze_failure_deltas.py`，将正确终态但策略违规、未检查目标订单和反复调用已关闭退货接口分开统计。
+- 增加向后兼容的 `strict-v3-reason-code` 评测协议，验证升级理由与目标订单政策匹配；strict-v2 历史轨迹和结果保持不变。
 
 ## 实验结论说明
 
@@ -56,6 +57,7 @@ return-v11 将问题推进到新冻结退货边界：seed45 为56/120，seed46 �
 - v10 seed复验汇总：`artifacts/v10-seed-replication-comparison.summary.json`
 - v11 结果报告：`docs/return_v11_results.md`
 - v11 失败差异分析：`artifacts/return-v11-*-failure-deltas.summary.json`
+- strict-v3 理由校验协议：[reason_code_protocol.md](reason_code_protocol.md)
 - 完整方案和实验口径：[factorial_v9_protocol.md](factorial_v9_protocol.md)
 - v10预注册方案与结果：[position_v10_protocol.md](position_v10_protocol.md)
 - v10 seed复验方案与结果：[position_v10_seed_replication_protocol.md](position_v10_seed_replication_protocol.md)

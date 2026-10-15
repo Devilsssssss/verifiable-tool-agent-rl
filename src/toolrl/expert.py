@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from .environment import RetailToolEnvironment
+from .environment import SCORING_PROTOCOL, RetailToolEnvironment
 from .prompts import conversation_prompt
 from .schemas import AgentTask
 
@@ -13,6 +13,7 @@ def reset_environment(
     task: AgentTask,
     *,
     reward_mode: str = "shaped",
+    scoring_protocol: str = SCORING_PROTOCOL,
 ) -> None:
     environment.reset(
         initial_state_json=json.dumps(task.initial_state, sort_keys=True),
@@ -20,6 +21,7 @@ def reset_environment(
         max_steps=task.max_steps,
         optimal_steps=task.optimal_steps,
         reward_mode=reward_mode,
+        scoring_protocol=scoring_protocol,
         task_id=task.task_id,
     )
 

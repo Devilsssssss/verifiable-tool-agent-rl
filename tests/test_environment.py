@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from toolrl.environment import RetailToolEnvironment
+from toolrl.environment import REASON_CODE_SCORING_PROTOCOL, RetailToolEnvironment
 from toolrl.expert import repair_training_row, replay_expert, reset_environment
 from toolrl.generator import FAMILIES, generate_tasks
 
@@ -66,6 +66,78 @@ def test_escalating_after_inspecting_only_distractor_is_not_success() -> None:
     assert report["terminal_goal_satisfied"] is True
     assert report["target_order_inspected"] is False
     assert report["success"] is False
+
+
+def test_reason_code_protocol_rejects_wrong_escalation_reason() -> None:
+    task = next(
+        task
+        for task in generate_tasks({"train": 5}, seed=8)
+        if task.family == "cancel_shipped"
+    )
+    environment = RetailToolEnvironment()
+    reset_environment(environment, task, scoring_protocol=REASON_CODE_SCORING_PROTOCOL)
+    user_id = int(task.initial_state["users"][0]["id"])
+    target_id = int(task.goal["order_id"])
+    environment.lookup_user(task.initial_state["users"][0]["email"])
+    environment.list_orders(user_id)
+    environment.get_order(target_id)
+
+    output = environment.escalate_to_human(
+        "The order has shipped and cannot be cancelled.",
+        reason_code="return_window_expired",
+    )
+
+    assert "escalation_reason_code_mismatch" in output
+    assert environment.reward_report["success"] is False
+    assert environment.reward_report["policy_compliant"] is False
+
+
+def test_reason_code_protocol_accepts_matching_escalation_reason() -> None:
+    task = next(
+        task
+        for task in generate_tasks({"train": 5}, seed=8)
+        if task.family == "return_expired"
+    )
+    environment = RetailToolEnvironment()
+    reset_environment(environment, task, scoring_protocol=REASON_CODE_SCORING_PROTOCOL)
+    user_id = int(task.initial_state["users"][0]["id"])
+    target_id = int(task.goal["order_id"])
+    environment.lookup_user(task.initial_state["users"][0]["email"])
+    environment.list_orders(user_id)
+    environment.get_order(target_id)
+    environment.escalate_to_human(
+        "The return window has expired.", reason_code="return_window_expired"
+    )
+
+    assert environment.reward_report["success"] is True
+    assert environment.reward_report["terminal_goal_satisfied"] is True
+
+
+def test_reason_code_protocol_still_requires_inspecting_the_target_order() -> None:
+    task = next(
+        task
+        for task in generate_tasks({"train": 5}, seed=8)
+        if task.family == "return_expired"
+    )
+    environment = RetailToolEnvironment()
+    reset_environment(environment, task, scoring_protocol=REASON_CODE_SCORING_PROTOCOL)
+    user_id = int(task.initial_state["users"][0]["id"])
+    target_id = int(task.goal["order_id"])
+    distractor_id = next(
+        int(row["id"])
+        for row in task.initial_state["orders"]
+        if int(row["id"]) != target_id
+    )
+    environment.lookup_user(task.initial_state["users"][0]["email"])
+    environment.list_orders(user_id)
+    environment.get_order(distractor_id)
+    environment.escalate_to_human(
+        "The return window has expired.", reason_code="return_window_expired"
+    )
+
+    assert environment.reward_report["terminal_goal_satisfied"] is True
+    assert environment.reward_report["target_order_inspected"] is False
+    assert environment.reward_report["success"] is False
 
 
 def test_step_limit_is_enforced() -> None:
