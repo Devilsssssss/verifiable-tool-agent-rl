@@ -61,3 +61,8 @@ def test_candidate_rejects_changed_training_budget(candidate):
     (adapter / "training_manifest.json").write_text(json.dumps(manifest))
     with pytest.raises(ValueError, match="controls differ"):
         module.checked_manifest(45, adapter)
+
+
+def test_candidate_uses_frozen_confirmation_task_artifact():
+    text = (ROOT / "scripts/evaluate_return_candidate.py").read_text()
+    assert '"artifacts/position-v10-confirmation-tasks.jsonl"' in text

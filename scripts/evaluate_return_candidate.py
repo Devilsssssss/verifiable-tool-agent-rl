@@ -107,7 +107,7 @@ def main() -> int:
         cases = (
             ("holdout", "data/return-holdout/tasks_test.jsonl",
              f"artifacts/return-holdout-seed{args.seed}.jsonl"),
-            ("regression", "data/position-v10-confirmation/tasks_test.jsonl", regression_baseline),
+            ("regression", "artifacts/position-v10-confirmation-tasks.jsonl", regression_baseline),
         )
         for label, tasks, baseline in cases:
             candidate = f"artifacts/return-v11-seed{args.seed}-{label}.jsonl"
