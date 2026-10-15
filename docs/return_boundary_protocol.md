@@ -30,7 +30,7 @@ Record strict success by family and target position, target-order inspection, wr
 
 ## Optional training intervention
 
-Train `return-v11` only after all three baseline runs have completed and their trajectories have been replayed. The age schedule was specified before baseline outcomes; the deterministic training files were materialized while baselines were still running, without inspecting or selecting holdout examples. This corrects the earlier wording that placed data-file generation after baseline archival; training has not started at this protocol update. Create `return-v11` from the existing position-v10 training tasks. The intervention changes only return target/distractor delivery ages:
+Train `return-v11` only after all three baseline runs have completed and their trajectories have been replayed. The age schedule was specified before baseline outcomes; the deterministic training files were materialized while baselines were still running, without inspecting or selecting holdout examples. This corrects the earlier wording that placed data-file generation after baseline archival; at protocol freeze, candidate training had not started. Create `return-v11` from the existing position-v10 training tasks. The intervention changes only return target/distractor delivery ages:
 
 - eligible target ages: 2, 14, 28 days;
 - expired target ages: 33, 46, 75 days;
