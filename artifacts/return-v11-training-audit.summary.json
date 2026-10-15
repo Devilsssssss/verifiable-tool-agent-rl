@@ -1,0 +1,45 @@
+{
+  "status": "frozen-before-training",
+  "seed": 20261031,
+  "independent_training_tasks": 300,
+  "total_views": 900,
+  "family_counts": {
+    "cancel_processing": 60,
+    "cancel_shipped": 60,
+    "exchange_cheaper": 60,
+    "return_eligible": 60,
+    "return_expired": 60
+  },
+  "lookup_views_byte_identical_to_v10": true,
+  "nonreturn_views_unchanged": true,
+  "semantic_audit": {
+    "tasks": 420,
+    "split_counts": {
+      "return-holdout": 120,
+      "train": 300
+    },
+    "family_counts": {
+      "cancel_processing": 60,
+      "cancel_shipped": 60,
+      "exchange_cheaper": 60,
+      "return_eligible": 120,
+      "return_expired": 120
+    },
+    "expert_successes": 420,
+    "noop_successes": 0,
+    "direct_shortcut_successes": 0,
+    "mean_expert_shaped_reward": 1.4,
+    "entity_overlap_across_splits": 0,
+    "task_sha256": "54d859395152943067451c6ff3022da76458477ceb307b22f9bc03cac66b330d",
+    "status": "pass"
+  },
+  "output_sha256": {
+    "tasks": "0676231c0d63a53ff156db2fe4e35224eca1122570950941f8a95ad3bc06442a",
+    "normal": "9fbc2d141291792aa2029e178e0be24e0db84e3fff2dd623d2f7ec48cc24e57b",
+    "repairs": "061d514b0e122206b5ca19fe718b994ae8d5438f37e9b2fa03fc0102864b3e39",
+    "lookup": "1dde933f7724b27e58e0182f89dbdfdf0f98baa944113e364cd5544614963784",
+    "extra": "064ed8fdecabe3e5870d193bdd0b2bffe031e6af15f920921b3d6179bcdb35e1"
+  },
+  "intervention": "Only return target/distractor delivery ages change; 900 views and positions preserved.",
+  "scope": "Equal views and optimizer steps, not equal token counts; two age factors change jointly."
+}
