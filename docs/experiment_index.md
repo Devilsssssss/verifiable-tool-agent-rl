@@ -18,3 +18,10 @@
 ## 面试讲法
 
 先用[项目简介](project_brief.md)讲问题和结论，再用[项目总结](project_summary.md)讲证据，最后打开具体协议和结果证明审计链路。最稳妥的表述是：完成了可验证环境、严格评分、策略捷径诊断和多 seed 监督对照，并据结果阻止了没有前置证据的 GRPO 实验。
+
+## 文件维护
+
+- 对外入口是 `README.md`、`docs/project_brief.md`、`docs/experiment_index.md` 和 `docs/project_summary.md`。
+- `scripts/` 中的生成、训练、评测、重放和审计脚本按实验版本保留；历史脚本仍对应协议或已提交摘要，不作为当前未完成任务。
+- `artifacts/` 只保留小型审计和聚合摘要；模型权重、逐条轨迹和生成数据由 `.gitignore` 排除。
+- 已完成的边界对照不会被删除或改写成成功结果；后续实验必须新建协议和独立确认集。
