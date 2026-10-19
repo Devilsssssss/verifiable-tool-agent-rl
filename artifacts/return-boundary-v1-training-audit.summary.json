@@ -1,0 +1,86 @@
+{
+  "status": "frozen-before-training",
+  "seed": 20261017,
+  "source": "F:\\\u627e\u5b9e\u4e60\\verifiable-tool-agent-rl\\data\\generated\\tasks_train.jsonl",
+  "source_sha256": {
+    "tasks": "d122f65101e6ffb9ddb4c386c520a8d555e9e9b80218771314f40b8fbd38cfaf"
+  },
+  "independent_training_tasks": 300,
+  "return_boundary_tasks": 120,
+  "normal_views": 300,
+  "repair_views": 300,
+  "lookup_views": 300,
+  "total_views": 900,
+  "return_family_counts": {
+    "return_eligible": 60,
+    "return_expired": 60
+  },
+  "return_family_position_counts": {
+    "return_eligible": {
+      "1": 30,
+      "2": 30
+    },
+    "return_expired": {
+      "1": 30,
+      "2": 30
+    }
+  },
+  "return_age_cells": {
+    "return_eligible": {
+      "target=29,distractor=8": 30,
+      "target=30,distractor=8": 30
+    },
+    "return_expired": {
+      "target=31,distractor=8": 30,
+      "target=32,distractor=8": 30
+    }
+  },
+  "target_age_schedule": {
+    "return_eligible": [
+      29,
+      30
+    ],
+    "return_expired": [
+      31,
+      32
+    ]
+  },
+  "distractor_age_schedule": [
+    8
+  ],
+  "semantic_audit": {
+    "tasks": 600,
+    "split_counts": {
+      "confirmation": 120,
+      "return-boundary-train": 120,
+      "test": 120,
+      "train": 180,
+      "validation": 60
+    },
+    "family_counts": {
+      "cancel_processing": 120,
+      "cancel_shipped": 120,
+      "exchange_cheaper": 120,
+      "return_eligible": 120,
+      "return_expired": 120
+    },
+    "expert_successes": 600,
+    "noop_successes": 0,
+    "direct_shortcut_successes": 0,
+    "mean_expert_shaped_reward": 1.3999999999999855,
+    "entity_overlap_across_splits": 0,
+    "task_sha256": "a47dc8828ab58d257a5acf0c829054970b05cb5e41441ce7aef0273a34180e6a",
+    "status": "pass"
+  },
+  "lookup_views_regenerated_from_same_tasks": true,
+  "nonreturn_views_unchanged": true,
+  "output_sha256": {
+    "tasks": "f2da50d596253f00462245de7c6c0d5de2a7b26a5872a95532ce671f9f3c3342",
+    "normal": "334860452347e54ff76242dde0bfdd2018892e3d8d417b0f63fbbe9a6e98dcba",
+    "repairs": "d10c3b271c10033a13ead61656a5fc70ca4361a7d0de4f37944c6f5f30a6acf8",
+    "lookup": "f1c5ffedc957c7e0e84565bb773c0d57af62bbcd56c3e4635f3db08bf27e1558",
+    "extra": "76b72fc88d598ee662ebb5077992bb82419d14fb17f4775acd88ef89bedb13fe"
+  },
+  "intervention": "Only return-task target position and target/distractor delivery ages change; all 300 tasks, 900 views, prompts, and lookup views remain in budget.",
+  "scope": "Independent supervised boundary comparison around the 30-day return cutoff; not an RL or GRPO experiment. Do not start GRPO until this comparison and the target-order gate are resolved."
+}

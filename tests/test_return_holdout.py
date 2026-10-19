@@ -97,3 +97,26 @@ def test_age_intervention_rejects_wrong_side_of_policy_boundary() -> None:
     )
     with pytest.raises(ValueError, match="delivery ages disagree"):
         vary_return_days(source, seed=96, days={**TRAIN_DAYS, "return_expired": (30,)})
+
+
+def test_age_intervention_accepts_custom_boundary_distractor_schedule() -> None:
+    source = create_balanced_position_tasks(
+        generate_tasks({"train": 60}), seed=97, output_split="train"
+    )
+    varied = vary_return_days(
+        source,
+        seed=98,
+        days={"return_eligible": (29, 30), "return_expired": (31, 32)},
+        distractor_days=(8,),
+    )
+    target_ages = Counter(
+        next(
+            order["days_since_delivery"]
+            for order in task.initial_state["orders"]
+            if order["id"] == task.goal["order_id"]
+        )
+        for task in varied
+        if task.family in RETURN_FAMILIES
+    )
+    assert target_ages == {29: 6, 30: 6, 31: 6, 32: 6}
+    assert audit_tasks(varied)["expert_successes"] == 60

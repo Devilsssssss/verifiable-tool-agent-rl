@@ -14,6 +14,8 @@
 | v11 seed45 | 新冻结退货 holdout | 56/120 | 相比匹配 v10 的 58/120 略有下降 |
 | v11 seed46 | 新冻结退货 holdout | 81/120 | 相比匹配 v10 的 54/120 提升，但只在一个训练 seed 上出现 |
 | v11 seed45/46 | 旧确认集回归 | 96/120、96/120 | 两个 seed 都低于匹配 v10，存在回归 |
+| return-boundary-v1 seed45 | 新退货 holdout / 旧确认集 | 78/120 / 87/120 | holdout 有提升但旧集显著回归，目标检查门槛未过 |
+| return-boundary-v1 seed46 | 新退货 holdout / 旧确认集 | 98/120 / 103/120 | holdout 提升、旧集基本持平；位置 2 和目标检查仍未达门槛 |
 
 v11 的结果不是 RL 增益证据，而是一次预先固定的监督数据分布干预：它改变了退货目标和干扰订单的年龄分布，同时保持训练视图数量和优化配置不变。完整配对结果和失败模式见 [return_v11_results.md](return_v11_results.md)。
 
@@ -28,6 +30,8 @@ v11 的结果不是 RL 增益证据，而是一次预先固定的监督数据分
 - 从失败轨迹定位出模型始终选择列表第一项，并发现旧评分器会把 7 条“检查错误订单后升级”的轨迹判成功；保留旧结果后新增目标订单检查约束并离线重放，避免用评分器修订掩盖原始结果。
 - 对两个等预算 factorial SFT 候选进行止损验证：原始提示协议下均为 `0/20`，因此停止继续扩充同类 SFT，未用奖励改写、解析器修补或确认集反向选模掩盖负结果。
 - 对 return-v11 两个训练 seed 做冻结 holdout 与旧确认集的 task-level gained/lost 分析；新增 `scripts/analyze_failure_deltas.py`，将正确终态但策略违规、未检查目标订单和反复调用已关闭退货接口分开统计。
+- 针对 v10 seed 复验暴露的退货分支失败，冻结 `return-boundary-v1` 监督对照：保留 300 个训练任务和 900 个视图，只将退货目标年龄放在 29/30 天与 31/32 天边界，并平衡目标订单位置；训练前语义审计覆盖 600 个任务，专家成功、实体隔离和捷径检查均通过。
+- 完成 return-boundary-v1 seed45/46 的匹配训练、退货 holdout、旧确认集回归、轨迹重放和配对分析；结果为 holdout `78/120、98/120`，旧确认集 `87/120、103/120`。一个 seed 明显回归，另一个 seed 只有不确定的小幅净增，因此维持 GRPO 阻断。
 - 增加向后兼容的 `strict-v3-reason-code` 评测协议，验证升级理由与目标订单政策匹配；strict-v2 历史轨迹和结果保持不变。
 
 ## 实验结论说明
@@ -36,14 +40,17 @@ v8在旧确认集达到120/120，但位置探针显示它第一位60/60、第二
 
 return-v11 将问题推进到新冻结退货边界：seed45 为56/120，seed46 为81/120，但两个 seed 在旧确认集都回退到96/120。seed46 在过期退货且目标第一位时达到29/30，却在目标第二位时为0/30。当前最稳妥的结论是：数据分布干预会改变策略表现，但收益依赖训练 seed，并可能损害已有能力；没有可信的 RL 增益。
 
+`return-boundary-v1` 已完成两次与 v10 对齐的监督训练和评测，但它仍不是 RL 结果。seed45 在旧确认集从 105/120 回退到 87/120，seed46 从 101/120 变为 103/120；holdout 的提升具有明显 seed sensitivity，且两个 seed 的目标订单检查率都低于全量门槛。因此不能把它写成稳定泛化或 RL 先验证据。
+
 ## 当前结论的边界
 
 - 结果主要证明固定输入协议下的 SFT 能力；v10 的总体提升未满足目标订单检查稳定性门槛，v11 又表现出 seed-sensitive 收益和旧集回归，因此不能声称数据干预或 RL 带来了稳定提升。
 - 三个训练seed均在同一合成确认集上改善了v8的第一位置捷径，但该集合的seed45结果已用于决定开展复验；复验不构成第二份独立盲测，不能外推为通用泛化。
 - seed45失败15/120，seed46/47各失败19/120，全部位于退货分支；复验还暴露出5条和12条错误订单检查后升级的轨迹，不能把这些终态正确的任务算作严格成功。
-- 没有可信的 RL 增益证据；位置平衡 SFT 的训练 seed 复验未通过预注册门槛，后续应先处理退货策略边界和目标检查，再决定是否进入 RL。
+- 没有可信的 RL 增益证据；位置平衡 SFT 的训练 seed 复验未通过预注册门槛，边界对照又显示一个 seed 明显回归、另一个 seed 只有小幅不确定净增。后续应先处理退货位置 2 和目标检查，再决定是否进入 RL。
 - 新退货 holdout 同时改变了实体、措辞和年龄分布，不能把结果解释成单独的年龄因果效应；旧确认集已经参与开发分析，只作为回归检查。
 - 所有严格成功都要求终态正确且没有策略违规；`terminal_goal_completion` 不能替代严格成功。
+- 边界对照已完成，但目标检查门槛仍未解决，因此不启动 GRPO；即使 holdout 有提升，也只能解释为监督数据干预的结果。
 
 ## 关键复现实验
 
@@ -57,6 +64,10 @@ return-v11 将问题推进到新冻结退货边界：seed45 为56/120，seed46 �
 - v10 seed复验汇总：`artifacts/v10-seed-replication-comparison.summary.json`
 - v11 结果报告：`docs/return_v11_results.md`
 - v11 失败差异分析：`artifacts/return-v11-*-failure-deltas.summary.json`
+- 退货边界训练集审计：`artifacts/return-boundary-v1-training-audit.summary.json`
+- 退货边界生成脚本：`scripts/create_return_boundary_training.py`
+- 退货边界协议：`docs/return_boundary_training_protocol.md`
+- 退货边界结果：`docs/return_boundary_v1_results.md`
 - strict-v3 理由校验协议：[reason_code_protocol.md](reason_code_protocol.md)
 - 完整方案和实验口径：[factorial_v9_protocol.md](factorial_v9_protocol.md)
 - v10预注册方案与结果：[position_v10_protocol.md](position_v10_protocol.md)

@@ -20,16 +20,19 @@ DISTRACTOR_DAYS = (8, 45)
 
 
 def vary_return_days(
-    tasks: list[AgentTask], *, seed: int, days: dict[str, tuple[int, ...]]
+    tasks: list[AgentTask], *, seed: int, days: dict[str, tuple[int, ...]],
+    distractor_days: tuple[int, ...] = DISTRACTOR_DAYS,
 ) -> list[AgentTask]:
     """Balance target/distractor delivery ages separately in each family/position cell."""
     result = list(tasks)
     rng = random.Random(seed)
+    if not distractor_days or any(day < 0 for day in distractor_days):
+        raise ValueError("distractor delivery ages must be nonnegative and nonempty")
     for family in RETURN_FAMILIES:
         eligible = family == "return_eligible"
         if not days[family] or any((day <= 30) != eligible or day < 0 for day in days[family]):
             raise ValueError(f"delivery ages disagree with family: {family}")
-        cells = [(target, distractor) for target in days[family] for distractor in DISTRACTOR_DAYS]
+        cells = [(target, distractor) for target in days[family] for distractor in distractor_days]
         for position in (1, 2):
             indices = [
                 index for index, task in enumerate(tasks)
@@ -39,14 +42,14 @@ def vary_return_days(
                 raise ValueError("each return family/position count must be a multiple of age cells")
             assignments = cells * (len(indices) // len(cells))
             rng.shuffle(assignments)
-            for index, (target_days, distractor_days) in zip(indices, assignments, strict=True):
+            for index, (target_days, distractor_age) in zip(indices, assignments, strict=True):
                 task = tasks[index]
                 state = deepcopy(task.initial_state)
                 for order in state["orders"]:
                     if order["id"] == task.goal["order_id"]:
                         order["days_since_delivery"] = target_days
                     else:
-                        order["days_since_delivery"] = distractor_days
+                        order["days_since_delivery"] = distractor_age
                 result[index] = replace(task, initial_state=state)
     return result
 

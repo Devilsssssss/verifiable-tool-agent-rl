@@ -1,0 +1,58 @@
+{
+  "run_name": "return-boundary-v1-seed45-holdout",
+  "model_id": "models/Qwen3-1.7B",
+  "adapter": "outputs/qwen3-1.7b-tool-sft-return-boundary-v1-seed45",
+  "seed": 42,
+  "temperature": 0.0,
+  "max_new_tokens": 512,
+  "input_format": "canonical-v4",
+  "input_intervention": "explicit-email-field-v1",
+  "tasks_path": "data/return-holdout/tasks_test.jsonl",
+  "tasks_sha256": "c8e70024ca2b0ae69e8754a60e0ecbf32d11e1a66cb1bec3275c82a70d3282e3",
+  "limit": 120,
+  "scoring_protocol": "strict-v2-target-inspection",
+  "overall": {
+    "tasks": 120,
+    "task_success": 0.65,
+    "policy_compliance": 0.65,
+    "mean_valid_tool_rate": 0.755,
+    "mean_steps": 6.575,
+    "mean_progress": 0.90875,
+    "mean_shaped_reward": 0.7790000000000001,
+    "terminal_goal_completion": 0.65,
+    "format_error_tasks": 0,
+    "format_recovery_successes": 0,
+    "format_recovery_rate": null,
+    "target_order_inspection_rate": 0.925
+  },
+  "by_family": {
+    "return_eligible": {
+      "tasks": 60,
+      "task_success": 0.95,
+      "policy_compliance": 0.95,
+      "mean_valid_tool_rate": 0.965,
+      "mean_steps": 5.25,
+      "mean_progress": 0.98,
+      "mean_shaped_reward": 1.3085,
+      "terminal_goal_completion": 0.95,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.95
+    },
+    "return_expired": {
+      "tasks": 60,
+      "task_success": 0.35,
+      "policy_compliance": 0.35,
+      "mean_valid_tool_rate": 0.545,
+      "mean_steps": 7.9,
+      "mean_progress": 0.8375,
+      "mean_shaped_reward": 0.24950000000000014,
+      "terminal_goal_completion": 0.35,
+      "format_error_tasks": 0,
+      "format_recovery_successes": 0,
+      "format_recovery_rate": null,
+      "target_order_inspection_rate": 0.9
+    }
+  }
+}

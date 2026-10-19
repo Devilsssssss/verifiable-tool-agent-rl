@@ -467,6 +467,8 @@ class RetailToolEnvironment:
 
         Args:
             reason: Concise explanation of the policy or capability limitation.
+            reason_code: Optional machine-readable policy reason used by the strict
+                reason-code scoring protocol.
 
         Returns:
             A JSON object confirming escalation.
