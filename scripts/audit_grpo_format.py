@@ -46,10 +46,17 @@ def main() -> int:
     mismatches = []
     # Inspect every assistant generation point, not just the initial user request.
     for row in rows:
-        for index, message in enumerate(row["messages"]):
-            if message["role"] != "assistant":
-                continue
-            history = row["messages"][:index]
+        if "messages" in row:
+            histories = [
+                (index, row["messages"][:index])
+                for index, message in enumerate(row["messages"])
+                if message["role"] == "assistant"
+            ]
+        else:
+            # Native GRPO rows only carry the initial conversation prompt;
+            # audit that prefix against the same tool schema used by training.
+            histories = [(None, row["prompt"])]
+        for index, history in histories:
             canonical = tokenizer.apply_chat_template(
                 canonical_messages(history),
                 tools=schemas,
