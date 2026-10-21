@@ -6,7 +6,7 @@ from copy import deepcopy
 from functools import wraps
 from typing import Any
 
-from .environment import RetailToolEnvironment
+from .environment import SCORING_PROTOCOL, RetailToolEnvironment
 from .expert import reset_environment
 from .prompts import conversation_prompt
 from .schemas import AgentTask
@@ -40,10 +40,16 @@ def run_episode(
     policy: ResponsePolicy,
     *,
     reward_mode: str = "shaped",
+    scoring_protocol: str = SCORING_PROTOCOL,
     max_turns: int | None = None,
 ) -> dict[str, Any]:
     environment = RetailToolEnvironment()
-    reset_environment(environment, task, reward_mode=reward_mode)
+    reset_environment(
+        environment,
+        task,
+        reward_mode=reward_mode,
+        scoring_protocol=scoring_protocol,
+    )
     messages: list[dict[str, Any]] = list(conversation_prompt(task.prompt))
     turns = max_turns or task.max_steps + 2
     generated_tokens = 0

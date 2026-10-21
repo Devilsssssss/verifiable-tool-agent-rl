@@ -4,7 +4,7 @@ import inspect
 import json
 from typing import Any
 
-from toolrl.environment import RetailToolEnvironment
+from toolrl.environment import REASON_CODE_SCORING_PROTOCOL, RetailToolEnvironment
 from toolrl.generator import generate_tasks
 from toolrl.rollout import environment_tools, run_episode
 
@@ -78,6 +78,38 @@ def test_rollout_executes_structured_tool_calls() -> None:
     assert record["success"] is True
     assert record["policy_compliant"] is True
     assert record["steps"] == task.optimal_steps
+
+
+def test_rollout_supports_reason_code_scoring_protocol() -> None:
+    task = generate_tasks({"train": 1})[0]
+    plan = iter(task.expert_plan)
+
+    def policy(messages: list[dict[str, Any]], tools: list) -> dict[str, Any]:
+        del messages, tools
+        try:
+            step = next(plan)
+        except StopIteration:
+            return {"role": "assistant", "content": "done"}
+        return {
+            "role": "assistant",
+            "content": "",
+            "tool_calls": [
+                {
+                    "type": "function",
+                    "function": {"name": step["tool"], "arguments": step["arguments"]},
+                }
+            ],
+        }
+
+    record = run_episode(
+        task,
+        policy,
+        reward_mode="strict_shaped",
+        scoring_protocol=REASON_CODE_SCORING_PROTOCOL,
+    )
+
+    assert record["success"] is True
+    assert record["reward"] > 1.5
 
 
 def test_rollout_penalizes_unknown_tool() -> None:

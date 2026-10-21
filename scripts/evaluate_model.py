@@ -15,7 +15,7 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 from toolrl.diagnostics import ExplicitEmailPrompt
-from toolrl.environment import SCORING_PROTOCOL
+from toolrl.environment import REASON_CODE_SCORING_PROTOCOL, SCORING_PROTOCOL
 from toolrl.formatting import INPUT_FORMAT
 from toolrl.io import load_tasks, write_jsonl
 from toolrl.metrics import summarize_reports
@@ -34,6 +34,16 @@ def main() -> int:
     parser.add_argument("--max-new-tokens", type=int, default=256)
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--reward-mode",
+        choices=("sparse", "shaped", "strict_shaped"),
+        default="shaped",
+    )
+    parser.add_argument(
+        "--scoring-protocol",
+        choices=(SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL),
+        default=SCORING_PROTOCOL,
+    )
     parser.add_argument("--input-format", choices=(INPUT_FORMAT, "legacy-v3"), default=INPUT_FORMAT)
     parser.add_argument(
         "--input-intervention",
@@ -76,9 +86,15 @@ def main() -> int:
     records = []
     partial_path = args.output.with_suffix(".partial.jsonl")
     for index, task in enumerate(tasks, start=1):
-        record = run_episode(task, policy)
+        record = run_episode(
+            task,
+            policy,
+            reward_mode=args.reward_mode,
+            scoring_protocol=args.scoring_protocol,
+        )
         record["run_name"] = args.run_name
-        record["scoring_protocol"] = SCORING_PROTOCOL
+        record["scoring_protocol"] = args.scoring_protocol
+        record["reward_mode"] = args.reward_mode
         if args.input_intervention != "original":
             record["input_intervention"] = args.input_intervention
         records.append(record)
@@ -105,12 +121,13 @@ def main() -> int:
         "seed": args.seed,
         "temperature": args.temperature,
         "max_new_tokens": args.max_new_tokens,
+        "reward_mode": args.reward_mode,
         "input_format": args.input_format,
         "input_intervention": args.input_intervention,
         "tasks_path": str(args.tasks),
         "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
         "limit": args.limit,
-        "scoring_protocol": SCORING_PROTOCOL,
+        "scoring_protocol": args.scoring_protocol,
         **summarize_reports(records),
     }
     summary_path = args.output.with_suffix(".summary.json")

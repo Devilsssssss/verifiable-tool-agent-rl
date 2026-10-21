@@ -8,7 +8,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from toolrl.environment import SCORING_PROTOCOL, RetailToolEnvironment
+from toolrl.environment import (
+    REASON_CODE_SCORING_PROTOCOL,
+    SCORING_PROTOCOL,
+    RetailToolEnvironment,
+)
 from toolrl.expert import reset_environment
 from toolrl.io import load_tasks, read_jsonl
 from toolrl.metrics import summarize_reports
@@ -21,6 +25,10 @@ def main() -> int:
     parser.add_argument("--tasks", type=Path, required=True)
     parser.add_argument("--rollouts", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--scoring-protocol",
+        choices=(SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL),
+    )
     args = parser.parse_args()
     tasks = {task.task_id: task for task in load_tasks(args.tasks)}
     records = read_jsonl(args.rollouts)
@@ -28,10 +36,9 @@ def main() -> int:
         args.rollouts.with_suffix(".summary.json").read_text(encoding="utf-8")
     )
     source_protocol = rollout_summary.get("scoring_protocol")
-    if source_protocol != SCORING_PROTOCOL:
-        raise ValueError(
-            f"rollouts use {source_protocol}; run scripts/rescore_rollouts.py before audit"
-        )
+    scoring_protocol = args.scoring_protocol or source_protocol
+    if scoring_protocol not in {SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL}:
+        raise ValueError(f"unsupported scoring protocol: {scoring_protocol}")
     assisted = [bool(record.get("oracle_first_lookup", False)) for record in records]
     if any(assisted) and not all(assisted):
         raise ValueError("cannot pool oracle-assisted and unaided rollouts")
@@ -47,7 +54,12 @@ def main() -> int:
             raise ValueError(f"duplicate rollout: {task.task_id}")
         seen.add(task.task_id)
         environment = RetailToolEnvironment()
-        reset_environment(environment, task)
+        reset_environment(
+            environment,
+            task,
+            reward_mode=rollout_summary.get("reward_mode", "shaped"),
+            scoring_protocol=scoring_protocol,
+        )
         for step in record["trace"]:
             if step["violation"] == "invalid_tool_call":
                 environment._record_external_failure(
@@ -72,7 +84,7 @@ def main() -> int:
         "input_intervention": next(iter(interventions)),
         "rollouts": str(args.rollouts),
         "tasks": str(args.tasks),
-        "scoring_protocol": source_protocol,
+        "scoring_protocol": scoring_protocol,
         "replay_verified": len(reports),
         "original_scores_unchanged": True,
         "wrong_email_tasks": wrong_email_tasks,
