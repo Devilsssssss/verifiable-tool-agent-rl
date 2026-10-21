@@ -2,7 +2,7 @@
 
 一个研究 Agentic RL 与大模型后训练的实验项目：在有状态的本地零售环境中训练小模型完成多轮工具调用，并用数据库终态与策略约束给出可执行、可复核的奖励。
 
-最新进展：位置平衡 SFT 的 v10 基线在新冻结的 120 条退货泛化任务上为 **58/120、54/120、46/120**。预注册的 return-v11 等视图年龄分布干预在 seed45/46 上分别得到 **56/120、81/120**，但在旧确认集回归上都低于匹配 v10（96/120 对 105/120、101/120）。随后完成了 return-boundary-v1 的 seed45/46 监督边界对照：holdout 为 **78/120、98/120**，但旧确认集回归为 **87/120、103/120**，一个 seed 明显回归、一个 seed 只是不确定的小幅变化，目标订单检查率也未达到全量门槛。因此不能声称稳定的 Agentic RL 或后训练增益，当前不启动 GRPO。详见[边界对照结果](docs/return_boundary_v1_results.md)、[基线结果与限制](docs/return_holdout_baseline_results.md)、[v11 结果报告](docs/return_v11_results.md)和[边界训练协议](docs/return_boundary_training_protocol.md)。
+最新进展：位置平衡 SFT 的 v10 基线在新冻结的 120 条退货泛化任务上为 **58/120、54/120、46/120**。预注册的 return-v11 等视图年龄分布干预在 seed45/46 上分别得到 **56/120、81/120**，但在旧确认集回归上都低于匹配 v10（96/120 对 105/120、101/120）。随后完成了 return-boundary-v1 的 seed45/46 监督边界对照：holdout 为 **78/120、98/120**，但旧确认集回归为 **87/120、103/120**，一个 seed 明显回归、一个 seed 只是不确定的小幅变化，目标订单检查率也未达到全量门槛。因此不能声称稳定的 Agentic RL 或后训练增益。现在只冻结了一轮最终 GRPO 对照协议和全新 holdout，训练尚未开始，结果不能预先承诺。详见[最终 GRPO 协议](docs/grpo_final_protocol.md)、[边界对照结果](docs/return_boundary_v1_results.md)、[基线结果与限制](docs/return_holdout_baseline_results.md)、[v11 结果报告](docs/return_v11_results.md)和[边界训练协议](docs/return_boundary_training_protocol.md)。
 
 对外快速入口：[一页项目说明](docs/project_brief.md)；实验路线与决策记录见[实验索引](docs/experiment_index.md)。
 

@@ -24,7 +24,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="GRPO for a stateful retail tool agent")
     parser.add_argument("--model-id", default="Qwen/Qwen3-1.7B")
     parser.add_argument("--sft-adapter", type=Path, required=True)
-    parser.add_argument("--reward-mode", choices=("sparse", "shaped"), required=True)
+    parser.add_argument(
+        "--reward-mode", choices=("sparse", "shaped", "strict_shaped"), required=True
+    )
     parser.add_argument("--train", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--max-steps", type=int, default=100)
@@ -110,6 +112,10 @@ def main() -> int:
         "base_model": args.model_id,
         "sft_adapter": str(args.sft_adapter),
         "reward_mode": args.reward_mode,
+        "scoring_protocol": next(
+            (row.get("scoring_protocol") for row in rows if row.get("scoring_protocol")),
+            "strict-v2-target-inspection",
+        ),
         "train_samples": len(dataset),
         "max_steps": args.max_steps,
         "learning_rate": args.learning_rate,

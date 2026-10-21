@@ -10,6 +10,7 @@ from typing import Any
 SCORING_PROTOCOL = "strict-v2-target-inspection"
 REASON_CODE_SCORING_PROTOCOL = "strict-v3-reason-code"
 SUPPORTED_SCORING_PROTOCOLS = {SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL}
+REWARD_MODES = {"sparse", "shaped", "strict_shaped"}
 
 
 def _drop_null_tool_slots(method):
@@ -58,7 +59,7 @@ class RetailToolEnvironment:
         scoring_protocol: str = SCORING_PROTOCOL,
         **_: Any,
     ) -> None:
-        if reward_mode not in {"sparse", "shaped"}:
+        if reward_mode not in REWARD_MODES:
             raise ValueError(f"unsupported reward mode: {reward_mode}")
         if scoring_protocol not in SUPPORTED_SCORING_PROTOCOLS:
             raise ValueError(f"unsupported scoring protocol: {scoring_protocol}")
@@ -517,6 +518,7 @@ class RetailToolEnvironment:
                 "efficient": False,
                 "sparse": 0.0,
                 "shaped": 0.0,
+                "strict_shaped": 0.0,
             }
         success = self._goal_satisfied()
         violations = [step["violation"] for step in self._trace if step["violation"]]
@@ -542,6 +544,18 @@ class RetailToolEnvironment:
             + (0.1 if efficient else 0.0)
             + (0.4 * progress if not success else 0.0)
         )
+        # Keep strict success as the only headline metric while exposing a
+        # denser learning signal for the final GRPO ablation. A correct
+        # terminal state without target inspection or with policy violations
+        # receives diagnostics, but never the success bonus.
+        strict_shaped = (
+            (1.0 if success else 0.0)
+            + (0.35 if terminal_goal else 0.0)
+            + (0.25 if target_order_inspected else 0.0)
+            + (0.20 if compliant else -0.50)
+            + (0.20 * progress if not success else 0.0)
+            - (0.05 if len(self._trace) > self._optimal_steps + 1 else 0.0)
+        )
         return {
             "success": success,
             "terminal_goal_satisfied": terminal_goal,
@@ -555,6 +569,7 @@ class RetailToolEnvironment:
             "progress": progress,
             "sparse": sparse,
             "shaped": shaped,
+            "strict_shaped": strict_shaped,
         }
 
     @property

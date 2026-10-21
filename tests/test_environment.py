@@ -164,6 +164,27 @@ def test_shaped_reward_reports_correct_prefix_progress() -> None:
     assert environment.get_reward() > -0.2
 
 
+def test_strict_shaped_reward_separates_terminal_and_policy_diagnostics() -> None:
+    task = next(task for task in generate_tasks({"train": 10}) if task.family == "return_expired")
+    environment = RetailToolEnvironment()
+    reset_environment(
+        environment,
+        task,
+        reward_mode="strict_shaped",
+        scoring_protocol="strict-v3-reason-code",
+    )
+    for step in task.expert_plan:
+        getattr(environment, step["tool"])(**step["arguments"])
+
+    report = environment.reward_report
+    assert report["success"] is True
+    assert report["terminal_goal_satisfied"] is True
+    assert report["target_order_inspected"] is True
+    assert report["policy_compliant"] is True
+    assert report["strict_shaped"] > 1.5
+    assert environment.get_reward() == report["strict_shaped"]
+
+
 @pytest.mark.parametrize("family", FAMILIES)
 def test_repair_training_row_contains_feedback_and_valid_recovery(family: str) -> None:
     task = next(task for task in generate_tasks({"train": 5}, seed=42) if task.family == family)

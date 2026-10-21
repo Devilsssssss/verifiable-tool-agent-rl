@@ -1,0 +1,19 @@
+{
+  "status": "frozen-before-grpo-training",
+  "source": "F:\\\u627e\u5b9e\u4e60\\verifiable-tool-agent-rl\\data\\return-boundary-v1\\tasks_train.jsonl",
+  "source_sha256": "f2da50d596253f00462245de7c6c0d5de2a7b26a5872a95532ce671f9f3c3342",
+  "output": "data\\grpo-final-v1\\train.jsonl",
+  "output_sha256": "ddd0eec57ec482867774f6ce5268f504cd6d8786af45e469c326998ecb1c5c21",
+  "tasks": 300,
+  "families": [
+    "cancel_processing",
+    "cancel_shipped",
+    "exchange_cheaper",
+    "return_eligible",
+    "return_expired"
+  ],
+  "reward_mode": "strict_shaped",
+  "scoring_protocol": "strict-v3-reason-code",
+  "expert_strict_successes": 300,
+  "scope": "Final two-seed GRPO attempt initialized from the audited return-boundary-v1 SFT adapter; holdout must be frozen separately before training."
+}

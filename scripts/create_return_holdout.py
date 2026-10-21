@@ -26,7 +26,9 @@ def main() -> int:
         "--summary", type=Path, default=ROOT / "artifacts/return-holdout-audit.summary.json"
     )
     parser.add_argument("--development-dir", type=Path, default=ROOT / "data/generated")
-    parser.add_argument("--position-training", type=Path, default=ROOT / "data/position-v10/tasks_train.jsonl")
+    parser.add_argument(
+        "--position-training", type=Path, default=ROOT / "data/generated/tasks_train.jsonl"
+    )
     parser.add_argument("--heldout", type=Path, nargs="*", default=[])
     args = parser.parse_args()
     generated = generate_tasks({"test": 300}, seed=args.seed)
@@ -37,8 +39,9 @@ def main() -> int:
         for split in ("train", "validation", "test")
         for task in load_tasks(args.development_dir / f"tasks_{split}.jsonl")
     ]
-    existing.extend(load_tasks(args.position_training))
-    existing.extend(task for path in args.heldout for task in load_tasks(path))
+    existing = _merge_unique(existing, load_tasks(args.position_training))
+    for path in args.heldout:
+        existing = _merge_unique(existing, load_tasks(path))
     audit = audit_tasks(existing + tasks)
     if args.output.exists() and load_tasks(args.output) != tasks:
         raise ValueError("refusing to overwrite a different frozen return holdout")
@@ -75,6 +78,20 @@ def main() -> int:
     args.summary.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(summary, indent=2))
     return 0
+
+
+def _merge_unique(existing, additions):
+    """Merge audit inputs while rejecting conflicting duplicate task IDs."""
+    by_id = {task.task_id: task for task in existing}
+    merged = list(existing)
+    for task in additions:
+        previous = by_id.get(task.task_id)
+        if previous is None:
+            by_id[task.task_id] = task
+            merged.append(task)
+        elif previous != task:
+            raise ValueError(f"conflicting duplicate task_id detected: {task.task_id}")
+    return merged
 
 
 if __name__ == "__main__":

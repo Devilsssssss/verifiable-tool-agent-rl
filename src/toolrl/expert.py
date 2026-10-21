@@ -181,7 +181,12 @@ def repair_training_row(task: AgentTask) -> dict[str, Any]:
     }
 
 
-def grpo_row(task: AgentTask, *, reward_mode: str) -> dict[str, Any]:
+def grpo_row(
+    task: AgentTask,
+    *,
+    reward_mode: str,
+    scoring_protocol: str = SCORING_PROTOCOL,
+) -> dict[str, Any]:
     return {
         "task_id": task.task_id,
         "family": task.family,
@@ -191,5 +196,6 @@ def grpo_row(task: AgentTask, *, reward_mode: str) -> dict[str, Any]:
         "max_steps": task.max_steps,
         "optimal_steps": task.optimal_steps,
         "reward_mode": reward_mode,
+        "scoring_protocol": scoring_protocol,
     }
 
