@@ -1,6 +1,6 @@
 # 最终 GRPO 对照协议
 
-状态：**协议已冻结，训练尚未开始。** 这是一轮有明确停止条件的最终 RL 对照，不会把旧 pilot 或监督数据干预结果重新包装成 GRPO 增益。
+状态：**协议已冻结，训练与评测已完成。** 这是一轮有明确停止条件的最终 RL 对照；结果未达到预注册门槛，因此不宣称 GRPO 增益。
 
 ## 研究问题
 
@@ -35,6 +35,19 @@
 3. 任一 seed 的奖励组内方差长期为零，或训练后严格成功率没有超过匹配 SFT baseline，均记录为 RL 阴性，不增加训练步数。
 4. 只有两个 seed 都在新 holdout 上超过匹配 SFT baseline，且目标订单检查率和政策合规率均达到 100%，才允许写“本环境下的 RL 增益”；否则结论为未证实。
 
+## 最终结果
+
+新冻结 holdout 共 120 条，使用 `strict-v3-reason-code` 与 `strict_shaped`，GRPO 与对应 SFT 起点逐 seed 配对：
+
+| seed | 匹配 SFT 严格成功 | GRPO 严格成功 | SFT 目标检查 / 合规 | GRPO 目标检查 / 合规 | 判断 |
+| ---: | ---: | ---: | ---: | ---: | --- |
+| 45 | 56/120 (46.7%) | 56/120 (46.7%) | 91.7% / 47.5% | 91.7% / 46.7% | 未超过 baseline |
+| 46 | 52/120 (43.3%) | 51/120 (42.5%) | 87.5% / 50.0% | 86.7% / 50.0% | 低于 baseline |
+
+旧 `position-confirmation` 回归集上，GRPO seed45/46 分别为 72/120 (60.0%) 和 71/120 (59.2%)；它只用于回归，不是盲测证据。训练过程中多次出现组内奖励方差为 0，说明本轮奖励在实际 rollout 上没有提供稳定区分度。
+
+**结论：本轮 RL 增益未证实，停止继续增加 GRPO 步数或挑选 checkpoint。** 这不是训练脚本失败，而是两个 seed 在新确认集上都没有超过匹配 SFT，且目标检查率、政策合规率均未达到 100%。下一步应优先修正退货位置 2、升级理由码和目标订单检查，再重新冻结协议；不应直接进入新的 RL 调参。
+
 ## 复现入口
 
 ```powershell
@@ -46,4 +59,4 @@ python scripts/create_return_holdout.py `
   --heldout data/position-confirmation/tasks_test.jsonl
 ```
 
-服务器训练命令、adapter 哈希、原始轨迹和逐 seed 评测结果必须写入 `artifacts/grpo-final-v1-*`。模型权重和逐条轨迹不进入 Git。
+服务器训练命令、adapter 哈希、原始轨迹和逐 seed 评测结果写入服务器 `artifacts/grpo-final-v1-*`；已拉回并纳入版本控制的聚合摘要包括 `*-holdout.summary.json` 和 `*-confirmation.summary.json`。模型权重和逐条轨迹不进入 Git。

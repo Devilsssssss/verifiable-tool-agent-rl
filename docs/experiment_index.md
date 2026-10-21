@@ -9,15 +9,15 @@
 | v10 位置平衡 SFT | 训练分布能否缓解位置捷径 | seed45/46/47 有改善，但目标检查稳定性门槛未过 | `docs/position_v10_protocol.md`、`docs/position_v10_seed_replication_protocol.md` |
 | return-v11 | 退货年龄分布干预是否稳定泛化 | seed-sensitive，旧确认集回归；不作为 RL 证据 | `docs/return_v11_results.md` |
 | return-boundary-v1 | 退货临界天数是否是主要失败来源 | holdout 提升不稳定，位置 2 和目标检查仍失败 | `docs/return_boundary_training_protocol.md`、`docs/return_boundary_v1_results.md` |
-| final GRPO protocol | 在修正奖励和全新 holdout 后是否仍能观察 RL 增益 | 协议已冻结，两个 seed 尚未训练 | `docs/grpo_final_protocol.md` |
+| final GRPO protocol | 在修正奖励和全新 holdout 后是否仍能观察 RL 增益 | seed45 持平、seed46 回归；目标检查/合规门槛未过，RL 增益未证实 | `docs/grpo_final_protocol.md`、`artifacts/grpo-final-v1-*-holdout.summary.json` |
 
 ## 当前状态
 
-已授权的监督诊断和边界对照均已完成。当前唯一开放项是已冻结的最终 GRPO 对照：它使用全新 holdout、两个 RL seed 和 strict-v3 奖励；在训练结果出来前不得声称 RL 增益。不要用专家演示、旧确认集或评分器修订替代模型结果。
+已授权的监督诊断、边界对照和最终 GRPO 对照均已完成。最终 GRPO 在全新 holdout 上未超过匹配 SFT，两个 seed 的目标检查/政策合规门槛也未通过，因此按协议收尾为“RL 增益未证实”。不要用专家演示、旧确认集或评分器修订替代模型结果。
 
 ## 面试讲法
 
-先用[项目简介](project_brief.md)讲问题和结论，再用[项目总结](project_summary.md)讲证据，最后打开具体协议和结果证明审计链路。最稳妥的表述是：完成了可验证环境、严格评分、策略捷径诊断和多 seed 监督对照，并据结果阻止了没有前置证据的 GRPO 实验。
+先用[项目简介](project_brief.md)讲问题和结论，再用[项目总结](project_summary.md)讲证据，最后打开具体协议和结果证明审计链路。最稳妥的表述是：完成了可验证环境、严格评分、策略捷径诊断、多 seed 监督对照和一次预注册的双 seed GRPO 复验；GRPO 未超过匹配 SFT，因此据证据停止继续调参。
 
 ## 文件维护
 
