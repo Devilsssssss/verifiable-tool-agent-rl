@@ -2,13 +2,13 @@
 
 一个研究 Agentic RL 与大模型后训练的实验项目：在有状态的本地零售环境中训练小模型完成多轮工具调用，并用数据库终态与策略约束给出可执行、可复核的奖励。
 
-最新进展：位置平衡 SFT 的 v10 基线在新冻结的 120 条退货泛化任务上为 **58/120、54/120、46/120**。预注册的 return-v11 等视图年龄分布干预在 seed45/46 上分别得到 **56/120、81/120**，但在旧确认集回归上都低于匹配 v10（96/120 对 105/120、101/120）。随后完成了 return-boundary-v1 的 seed45/46 监督边界对照：holdout 为 **78/120、98/120**，但旧确认集回归为 **87/120、103/120**，一个 seed 明显回归、一个 seed 只是不确定的小幅变化，目标订单检查率也未达到全量门槛。最后按冻结协议完成了双 seed GRPO：新 holdout 上 seed45 为 **56/120**（匹配 SFT 也是 56/120），seed46 为 **51/120**（匹配 SFT 为 52/120），目标检查和政策合规均未达门槛。因此本项目目前的可信结论是“RL 增益未证实”，而不是声称稳定的 Agentic RL 或后训练增益。详见[最终 GRPO 协议](docs/grpo_final_protocol.md)、[边界对照结果](docs/return_boundary_v1_results.md)、[基线结果与限制](docs/return_holdout_baseline_results.md)、[v11 结果报告](docs/return_v11_results.md)和[边界训练协议](docs/return_boundary_training_protocol.md)。
+最新进展：位置平衡 SFT 的 v10 基线在新冻结的 120 条退货泛化任务上为 **58/120、54/120、46/120**。预注册的 return-v11 等视图年龄分布干预在 seed45/46 上分别得到 **56/120、81/120**，但在旧确认集回归上都低于匹配 v10（96/120 对 105/120、101/120）。随后完成了 return-boundary-v1 的 seed45/46 监督边界对照：holdout 为 **78/120、98/120**，但旧确认集回归为 **87/120、103/120**，一个 seed 明显回归、一个 seed 只是不确定的小幅变化，目标订单检查率也未达到全量门槛。最后按冻结协议完成了双 seed GRPO：新 holdout 上 seed45 为 **56/120**（匹配 SFT 也是 56/120），seed46 为 **51/120**（匹配 SFT 为 52/120），目标检查和政策合规均未达门槛。因此本项目目前的可信结论是“RL 增益未证实”，而不是声称稳定的 Agentic RL 或后训练增益。逐条失败归因显示过期退货分支的理由码契约没有在初始化 SFT 的可观测输入中显式提供；下一步应先修复输入/动作契约并做 SFT 复验，不继续调 GRPO。详见[最终 GRPO 协议](docs/grpo_final_protocol.md)、[GRPO 失败归因](docs/grpo_failure_analysis.md)、[边界对照结果](docs/return_boundary_v1_results.md)、[基线结果与限制](docs/return_holdout_baseline_results.md)、[v11 结果报告](docs/return_v11_results.md)和[边界训练协议](docs/return_boundary_training_protocol.md)。
 
 对外快速入口：[一页项目说明](docs/project_brief.md)；实验路线与决策记录见[实验索引](docs/experiment_index.md)。
 
 边界数据生成、语义审计、Qwen3-1.7B seed45/46 训练、120 条 holdout、旧确认集回归、轨迹重放和配对分析均已完成。冻结产物位于 `data/return-boundary-v1/`，审计摘要为 `artifacts/return-boundary-v1-training-audit.summary.json`，结果见 `docs/return_boundary_v1_results.md`。训练使用远端锁定依赖，不能把本地专家演示替代模型结果。
 
-边界对照已经完成，但两个 seed 的目标订单检查率仍为 90.0%--92.5%，且旧确认集出现 seed-sensitive 回归；在目标检查和位置 2 门槛解决前不进入 GRPO。
+边界对照已经完成，但两个 seed 的目标订单检查率仍为 90.0%--92.5%，且旧确认集出现 seed-sensitive 回归。最终双 seed GRPO 已按冻结协议完成但未超过匹配 SFT；在目标检查、位置 2 和理由码契约解决前不继续进入新的 RL 调参。
 
 面试复核入口：先看 [项目总结](docs/project_summary.md)，再运行下面的失败差异分析（需要已生成的评测产物）：
 

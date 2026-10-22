@@ -9,7 +9,7 @@
 | v10 位置平衡 SFT | 训练分布能否缓解位置捷径 | seed45/46/47 有改善，但目标检查稳定性门槛未过 | `docs/position_v10_protocol.md`、`docs/position_v10_seed_replication_protocol.md` |
 | return-v11 | 退货年龄分布干预是否稳定泛化 | seed-sensitive，旧确认集回归；不作为 RL 证据 | `docs/return_v11_results.md` |
 | return-boundary-v1 | 退货临界天数是否是主要失败来源 | holdout 提升不稳定，位置 2 和目标检查仍失败 | `docs/return_boundary_training_protocol.md`、`docs/return_boundary_v1_results.md` |
-| final GRPO protocol | 在修正奖励和全新 holdout 后是否仍能观察 RL 增益 | seed45 持平、seed46 回归；目标检查/合规门槛未过，RL 增益未证实 | `docs/grpo_final_protocol.md`、`artifacts/grpo-final-v1-*-holdout.summary.json` |
+| final GRPO protocol | 在修正奖励和全新 holdout 后是否仍能观察 RL 增益 | seed45 持平、seed46 回归；目标检查/合规门槛未过，RL 增益未证实；失败主因是理由码契约未显式可观测 | `docs/grpo_final_protocol.md`、`docs/grpo_failure_analysis.md`、`artifacts/grpo-final-v1-failure-analysis.summary.json` |
 
 ## 当前状态
 

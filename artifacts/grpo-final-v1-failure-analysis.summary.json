@@ -1,0 +1,233 @@
+{
+  "version": "grpo-failure-analysis-v1",
+  "tasks": "data\\grpo-final-v1\\holdout\\tasks_test.jsonl",
+  "tasks_sha256": "58655c1cf165afd482bdef83509db291dd208fa4f95e5ec58454a0cd4f5416e5",
+  "runs": [
+    {
+      "run": "artifacts\\grpo-final-v1-sft45-holdout.jsonl",
+      "tasks": 120,
+      "failures": 64,
+      "successes": 56,
+      "failure_rate": 0.5333333333333333,
+      "failure_categories": {
+        "expired_retry_request_return": 37,
+        "step_limit_after_failure": 63,
+        "wrong_or_missing_reason_code": 23,
+        "missing_target_order_inspection": 10,
+        "eligible_return_regression": 4
+      },
+      "violations": {
+        "return_window_closed": 200,
+        "step_limit": 126,
+        "escalation_reason_code_mismatch": 115
+      },
+      "reason_code_arguments": {
+        "<missing>": 162
+      },
+      "by_family": {
+        "return_eligible": {
+          "tasks": 60,
+          "successes": 56,
+          "failures": 4
+        },
+        "return_expired": {
+          "tasks": 60,
+          "failures": 60
+        }
+      },
+      "by_position": {
+        "1": {
+          "tasks": 60,
+          "successes": 30,
+          "failures": 30
+        },
+        "2": {
+          "tasks": 60,
+          "successes": 26,
+          "failures": 34
+        }
+      }
+    },
+    {
+      "run": "artifacts\\grpo-final-v1-grpo45-holdout.jsonl",
+      "tasks": 120,
+      "failures": 64,
+      "successes": 56,
+      "failure_rate": 0.5333333333333333,
+      "failure_categories": {
+        "expired_retry_request_return": 37,
+        "step_limit_after_failure": 64,
+        "wrong_or_missing_reason_code": 23,
+        "missing_target_order_inspection": 10,
+        "eligible_return_regression": 4
+      },
+      "violations": {
+        "return_window_closed": 205,
+        "step_limit": 128,
+        "escalation_reason_code_mismatch": 115
+      },
+      "reason_code_arguments": {
+        "<missing>": 161
+      },
+      "by_family": {
+        "return_eligible": {
+          "tasks": 60,
+          "successes": 56,
+          "failures": 4
+        },
+        "return_expired": {
+          "tasks": 60,
+          "failures": 60
+        }
+      },
+      "by_position": {
+        "1": {
+          "tasks": 60,
+          "successes": 30,
+          "failures": 30
+        },
+        "2": {
+          "tasks": 60,
+          "successes": 26,
+          "failures": 34
+        }
+      }
+    },
+    {
+      "run": "artifacts\\grpo-final-v1-sft46-holdout.jsonl",
+      "tasks": 120,
+      "failures": 68,
+      "successes": 52,
+      "failure_rate": 0.5666666666666667,
+      "failure_categories": {
+        "wrong_or_missing_reason_code": 49,
+        "step_limit_after_failure": 60,
+        "missing_target_order_inspection": 15,
+        "eligible_return_regression": 8,
+        "expired_retry_request_return": 11
+      },
+      "violations": {
+        "escalation_reason_code_mismatch": 245,
+        "step_limit": 120,
+        "return_window_closed": 55
+      },
+      "reason_code_arguments": {
+        "<missing>": 351
+      },
+      "by_family": {
+        "return_eligible": {
+          "tasks": 60,
+          "successes": 52,
+          "failures": 8
+        },
+        "return_expired": {
+          "tasks": 60,
+          "failures": 60
+        }
+      },
+      "by_position": {
+        "1": {
+          "tasks": 60,
+          "successes": 30,
+          "failures": 30
+        },
+        "2": {
+          "tasks": 60,
+          "successes": 22,
+          "failures": 38
+        }
+      }
+    },
+    {
+      "run": "artifacts\\grpo-final-v1-grpo46-holdout.jsonl",
+      "tasks": 120,
+      "failures": 69,
+      "successes": 51,
+      "failure_rate": 0.575,
+      "failure_categories": {
+        "wrong_or_missing_reason_code": 47,
+        "step_limit_after_failure": 60,
+        "expired_retry_request_return": 13,
+        "missing_target_order_inspection": 16,
+        "eligible_return_regression": 9
+      },
+      "violations": {
+        "escalation_reason_code_mismatch": 235,
+        "step_limit": 120,
+        "return_window_closed": 65
+      },
+      "reason_code_arguments": {
+        "<missing>": 338
+      },
+      "by_family": {
+        "return_eligible": {
+          "tasks": 60,
+          "successes": 51,
+          "failures": 9
+        },
+        "return_expired": {
+          "tasks": 60,
+          "failures": 60
+        }
+      },
+      "by_position": {
+        "1": {
+          "tasks": 60,
+          "successes": 30,
+          "failures": 30
+        },
+        "2": {
+          "tasks": 60,
+          "successes": 21,
+          "failures": 39
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "failure_categories": {
+      "expired_retry_request_return": 98,
+      "step_limit_after_failure": 247,
+      "wrong_or_missing_reason_code": 142,
+      "missing_target_order_inspection": 51,
+      "eligible_return_regression": 25
+    },
+    "violations": {
+      "return_window_closed": 525,
+      "step_limit": 494,
+      "escalation_reason_code_mismatch": 710
+    },
+    "reason_code_arguments": {
+      "<missing>": 1012
+    },
+    "by_family": {
+      "return_eligible": {
+        "tasks": 240,
+        "successes": 215,
+        "failures": 25
+      },
+      "return_expired": {
+        "tasks": 240,
+        "failures": 240
+      }
+    },
+    "by_position": {
+      "1": {
+        "tasks": 240,
+        "successes": 120,
+        "failures": 120
+      },
+      "2": {
+        "tasks": 240,
+        "successes": 95,
+        "failures": 145
+      }
+    }
+  },
+  "interpretation": {
+    "primary_bottleneck": "return_expired",
+    "mechanism": "The boundary-v1 SFT initialization was trained without machine-readable reason_code arguments, while strict-v3 requires an exact reason_code that is not exposed in the natural-language prompt.",
+    "next_experiment": "Expose the reason-code contract in the system/tool prompt and run a matched two-seed SFT repair before attempting another RL experiment.",
+    "do_not_do": "Do not relax strict-v3 scoring or treat repeated request_return calls as progress; both would hide the actual policy failure."
+  }
+}
