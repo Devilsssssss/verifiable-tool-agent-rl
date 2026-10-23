@@ -1,0 +1,41 @@
+{
+  "status": "audited-before-sft-training",
+  "output_dir": "F:\\\u627e\u5b9e\u4e60\\verifiable-tool-agent-rl\\data\\reason-code-sft-v1",
+  "scoring_protocol": "strict-v3-reason-code",
+  "input_contract": "reason-code-v1",
+  "prompt_contract": "strict-v3 system rules expose the required reason_code enum and forbid retrying request_return after return_window_closed",
+  "splits": {
+    "train": {
+      "source": "F:\\\u627e\u5b9e\u4e60\\verifiable-tool-agent-rl\\data\\return-boundary-v1\\tasks_train.jsonl",
+      "source_sha256": "f2da50d596253f00462245de7c6c0d5de2a7b26a5872a95532ce671f9f3c3342",
+      "tasks": 300,
+      "strict_v3_expert_successes": 300,
+      "normal_views": 300,
+      "repair_views": 300,
+      "lookup_views": 300,
+      "total_training_views": 900,
+      "output_sha256": {
+        "tasks": "61b591d99d5d7b8587db75cb279822444a79e95880197e217f83060fd07b1cfb",
+        "normal": "82db80b0b3714572600c3fef6ca698ceb3d246a8979c681657c3e593a009fc55",
+        "repairs": "ae78646469db2481d799b9fd5e8f9ae7f7911973595921091c0e8a1a7db41a89",
+        "lookup": "52c25bb09dce3985dabe401a34cab560959c7cc875c4eee52fbe894bf1a4fec0",
+        "extra": "8a1912d05afa92f29f3240c7ad6cee595be7db3b3d161b26df90cba92acf977a"
+      }
+    },
+    "validation": {
+      "source": "F:\\\u627e\u5b9e\u4e60\\verifiable-tool-agent-rl\\data\\generated\\tasks_validation.jsonl",
+      "source_sha256": "486f40e7bb804155471e3707575d536f63395ac5cf3a93886f2a7e6d16dd9942",
+      "tasks": 60,
+      "strict_v3_expert_successes": 60,
+      "normal_views": 60,
+      "repair_views": 60,
+      "lookup_views": 0,
+      "total_training_views": null,
+      "output_sha256": {
+        "tasks": "2c0abbbb240e682fef43d0e08e8bfb86693bab679b67c04ca3c3f00dc216fe47",
+        "normal": "9e60ca25446bb014971cd4bb955bc7aacb761921f4fc39a44cfec90b57a49c33",
+        "repairs": "fa9c355283896f131cfc108867f1aab3e46597346dcf1be963437b651847e18f"
+      }
+    }
+  }
+}

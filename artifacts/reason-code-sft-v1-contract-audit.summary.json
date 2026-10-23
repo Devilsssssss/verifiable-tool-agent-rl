@@ -1,0 +1,35 @@
+{
+  "input_contract": "reason-code-v1",
+  "files": {
+    "data\\reason-code-sft-v1\\sft_train.jsonl": {
+      "rows": 300,
+      "prompt_contract_rows": 300,
+      "escalation_calls": 120
+    },
+    "data\\reason-code-sft-v1\\sft_repair_train.jsonl": {
+      "rows": 300,
+      "prompt_contract_rows": 300,
+      "escalation_calls": 240
+    },
+    "data\\reason-code-sft-v1\\sft_lookup_train.jsonl": {
+      "rows": 300,
+      "prompt_contract_rows": 300,
+      "escalation_calls": 0
+    },
+    "data\\reason-code-sft-v1\\sft_repair_lookup_train.jsonl": {
+      "rows": 600,
+      "prompt_contract_rows": 600,
+      "escalation_calls": 240
+    },
+    "data\\reason-code-sft-v1\\sft_validation.jsonl": {
+      "rows": 60,
+      "prompt_contract_rows": 60,
+      "escalation_calls": 24
+    },
+    "data\\reason-code-sft-v1\\sft_repair_validation.jsonl": {
+      "rows": 60,
+      "prompt_contract_rows": 60,
+      "escalation_calls": 48
+    }
+  }
+}
