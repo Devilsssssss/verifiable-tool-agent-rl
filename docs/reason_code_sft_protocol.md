@@ -39,6 +39,12 @@ python scripts/create_reason_code_sft_data.py
 - strict-v3 专家重放：训练 300/300，验证 60/60；
 - 数据摘要：artifacts/reason-code-sft-v1-training-audit.summary.json。
 
+生成后先运行不依赖模型的契约审计：
+
+~~~powershell
+python scripts/audit_reason_code_data.py --data data/reason-code-sft-v1/sft_train.jsonl data/reason-code-sft-v1/sft_repair_train.jsonl data/reason-code-sft-v1/sft_lookup_train.jsonl data/reason-code-sft-v1/sft_repair_lookup_train.jsonl data/reason-code-sft-v1/sft_validation.jsonl data/reason-code-sft-v1/sft_repair_validation.jsonl --output artifacts/reason-code-sft-v1-contract-audit.summary.json
+~~~
+
 训练前还必须运行真实 SFT mask 审计，且所有 mismatch、空监督和截断计数为零。
 
 ## 训练与评测
