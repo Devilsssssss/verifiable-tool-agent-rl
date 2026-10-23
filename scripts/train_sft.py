@@ -17,6 +17,7 @@ if str(ROOT / "src") not in sys.path:
 from toolrl.environment import RetailToolEnvironment
 from toolrl.formatting import INPUT_FORMAT, canonical_tool_schemas, sft_conversation
 from toolrl.io import read_jsonl
+from toolrl.prompts import INPUT_CONTRACTS, LEGACY_INPUT_CONTRACT
 from toolrl.rollout import environment_tools
 
 
@@ -37,6 +38,11 @@ def main() -> int:
     parser.add_argument("--gradient-accumulation", type=int, default=8)
     parser.add_argument("--max-train-samples", type=int)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument(
+        "--input-contract",
+        choices=INPUT_CONTRACTS,
+        default=LEGACY_INPUT_CONTRACT,
+    )
     args = parser.parse_args()
 
     import torch
@@ -50,7 +56,10 @@ def main() -> int:
     patched_template = get_training_chat_template(tokenizer)
     if patched_template is not None:
         tokenizer.chat_template = patched_template
-    tools = environment_tools(RetailToolEnvironment())
+    tools = environment_tools(
+        RetailToolEnvironment(),
+        input_contract=args.input_contract,
+    )
     tool_schemas = canonical_tool_schemas(tools)
 
     def as_conversations(rows: list[dict]) -> Dataset:
@@ -129,6 +138,7 @@ def main() -> int:
         "completion_only_loss": True,
         "repair_prefix_supervised": False,
         "input_format": INPUT_FORMAT,
+        "input_contract": args.input_contract,
         "batch_size": args.batch_size,
         "gradient_accumulation": args.gradient_accumulation,
         "optimizer_steps": trainer.state.global_step,

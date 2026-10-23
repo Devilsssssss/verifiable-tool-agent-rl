@@ -19,6 +19,7 @@ from toolrl.formatting import (
     sft_conversation,
 )
 from toolrl.io import read_jsonl
+from toolrl.prompts import INPUT_CONTRACTS, LEGACY_INPUT_CONTRACT
 from toolrl.rollout import environment_tools
 
 
@@ -28,6 +29,11 @@ def main() -> int:
     parser.add_argument("--data", type=Path, nargs="+", required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--max-length", type=int, default=4096)
+    parser.add_argument(
+        "--input-contract",
+        choices=INPUT_CONTRACTS,
+        default=LEGACY_INPUT_CONTRACT,
+    )
     args = parser.parse_args()
 
     import torch
@@ -42,7 +48,10 @@ def main() -> int:
         patched = get_training_chat_template(current)
         if patched is not None:
             current.chat_template = patched
-    tools = environment_tools(RetailToolEnvironment())
+    tools = environment_tools(
+        RetailToolEnvironment(),
+        input_contract=args.input_contract,
+    )
     schemas = canonical_tool_schemas(tools)
     rows = [row for path in args.data for row in read_jsonl(path)]
     conversations = [sft_conversation(row, schemas) for row in rows]
@@ -130,6 +139,7 @@ def main() -> int:
     summary = {
         "model_id": args.model_id,
         "input_format": INPUT_FORMAT,
+        "input_contract": args.input_contract,
         "data": [str(path) for path in args.data],
         "max_length": args.max_length,
         "samples": len(examples),

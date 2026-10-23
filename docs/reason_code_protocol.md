@@ -43,3 +43,10 @@ This is an evaluator-integrity improvement, not a model-training result. The
 existing v10/v11 numbers and all README claims remain strict-v2 results. A
 future v3 evaluation should include positive examples, a correct target with a
 wrong reason code, and a distractor-only inspection before escalation.
+
+The model-facing input contract is a separate opt-in switch:
+--input-contract reason-code-v1. It adds the reason-code rules to the system
+prompt and makes the escalate_to_human.reason_code schema required with the
+two exact enum values. Selecting strict-v3 scoring alone does not change the
+historical prompt or tool schema. The matched SFT repair protocol is documented
+in reason_code_sft_protocol.md.

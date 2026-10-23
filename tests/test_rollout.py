@@ -6,6 +6,7 @@ from typing import Any
 
 from toolrl.environment import REASON_CODE_SCORING_PROTOCOL, RetailToolEnvironment
 from toolrl.generator import generate_tasks
+from toolrl.prompts import REASON_CODE_INPUT_CONTRACT
 from toolrl.rollout import environment_tools, run_episode
 
 
@@ -40,6 +41,41 @@ def test_tool_adapter_drops_null_schema_slots() -> None:
     result = lookup(email=task.initial_state["users"][0]["email"], user_id=None)
 
     assert '"ok": true' in result
+
+
+def test_reason_code_input_contract_requires_reason_code() -> None:
+    task = next(task for task in generate_tasks({"train": 5}, seed=8) if task.family == "return_expired")
+    environment = RetailToolEnvironment()
+    environment.reset(
+        initial_state_json=json.dumps(task.initial_state),
+        goal_json=json.dumps(task.goal),
+        max_steps=task.max_steps,
+        optimal_steps=task.optimal_steps,
+        scoring_protocol=REASON_CODE_SCORING_PROTOCOL,
+    )
+    escalate = next(
+        tool
+        for tool in environment_tools(
+            environment,
+            input_contract=REASON_CODE_INPUT_CONTRACT,
+        )
+        if tool.__name__ == "escalate_to_human"
+    )
+    parameter = inspect.signature(escalate).parameters["reason_code"]
+    assert parameter.default is inspect.Parameter.empty
+    assert "shipped_order_cannot_cancel" in str(parameter.annotation)
+    assert "return_window_expired" in str(parameter.annotation)
+
+
+def test_strict_v3_scoring_does_not_change_legacy_tool_schema() -> None:
+    environment = RetailToolEnvironment()
+    escalate = next(
+        tool
+        for tool in environment_tools(environment)
+        if tool.__name__ == "escalate_to_human"
+    )
+
+    assert inspect.signature(escalate).parameters["reason_code"].default is None
 
 
 def test_trl_style_reflection_is_safe_before_environment_reset() -> None:

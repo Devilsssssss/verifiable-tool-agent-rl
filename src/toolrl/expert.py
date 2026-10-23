@@ -4,7 +4,7 @@ import json
 from typing import Any
 
 from .environment import SCORING_PROTOCOL, RetailToolEnvironment
-from .prompts import conversation_prompt
+from .prompts import LEGACY_INPUT_CONTRACT, conversation_prompt
 from .schemas import AgentTask
 
 
@@ -26,10 +26,23 @@ def reset_environment(
     )
 
 
-def replay_expert(task: AgentTask, *, reward_mode: str = "shaped") -> dict[str, Any]:
+def replay_expert(
+    task: AgentTask,
+    *,
+    reward_mode: str = "shaped",
+    scoring_protocol: str = SCORING_PROTOCOL,
+    input_contract: str = LEGACY_INPUT_CONTRACT,
+) -> dict[str, Any]:
     environment = RetailToolEnvironment()
-    reset_environment(environment, task, reward_mode=reward_mode)
-    messages: list[dict[str, Any]] = list(conversation_prompt(task.prompt))
+    reset_environment(
+        environment,
+        task,
+        reward_mode=reward_mode,
+        scoring_protocol=scoring_protocol,
+    )
+    messages: list[dict[str, Any]] = list(
+        conversation_prompt(task.prompt, input_contract=input_contract)
+    )
     for index, step in enumerate(task.expert_plan, start=1):
         tool_name = str(step["tool"])
         arguments = dict(step["arguments"])
@@ -72,8 +85,19 @@ def replay_expert(task: AgentTask, *, reward_mode: str = "shaped") -> dict[str, 
     }
 
 
-def training_row(task: AgentTask, *, reward_mode: str = "shaped") -> dict[str, Any]:
-    replay = replay_expert(task, reward_mode=reward_mode)
+def training_row(
+    task: AgentTask,
+    *,
+    reward_mode: str = "shaped",
+    scoring_protocol: str = SCORING_PROTOCOL,
+    input_contract: str = LEGACY_INPUT_CONTRACT,
+) -> dict[str, Any]:
+    replay = replay_expert(
+        task,
+        reward_mode=reward_mode,
+        scoring_protocol=scoring_protocol,
+        input_contract=input_contract,
+    )
     if not replay["reward_report"]["success"]:
         raise ValueError(f"expert plan failed for {task.task_id}")
     return {
@@ -84,11 +108,18 @@ def training_row(task: AgentTask, *, reward_mode: str = "shaped") -> dict[str, A
     }
 
 
-def repair_training_row(task: AgentTask) -> dict[str, Any]:
+def repair_training_row(
+    task: AgentTask,
+    *,
+    scoring_protocol: str = SCORING_PROTOCOL,
+    input_contract: str = LEGACY_INPUT_CONTRACT,
+) -> dict[str, Any]:
     """Create one verified tool-argument repair example for SFT."""
     environment = RetailToolEnvironment()
-    reset_environment(environment, task)
-    messages: list[dict[str, Any]] = list(conversation_prompt(task.prompt))
+    reset_environment(environment, task, scoring_protocol=scoring_protocol)
+    messages: list[dict[str, Any]] = list(
+        conversation_prompt(task.prompt, input_contract=input_contract)
+    )
     inserted = False
     repair_boundary = 0
     call_index = 0
@@ -186,11 +217,12 @@ def grpo_row(
     *,
     reward_mode: str,
     scoring_protocol: str = SCORING_PROTOCOL,
+    input_contract: str = LEGACY_INPUT_CONTRACT,
 ) -> dict[str, Any]:
     return {
         "task_id": task.task_id,
         "family": task.family,
-        "prompt": conversation_prompt(task.prompt),
+        "prompt": conversation_prompt(task.prompt, input_contract=input_contract),
         "initial_state_json": json.dumps(task.initial_state, sort_keys=True),
         "goal_json": json.dumps(task.goal, sort_keys=True),
         "max_steps": task.max_steps,

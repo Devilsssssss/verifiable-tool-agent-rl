@@ -19,6 +19,7 @@ from toolrl.environment import REASON_CODE_SCORING_PROTOCOL, SCORING_PROTOCOL
 from toolrl.formatting import INPUT_FORMAT
 from toolrl.io import load_tasks, write_jsonl
 from toolrl.metrics import summarize_reports
+from toolrl.prompts import INPUT_CONTRACTS, LEGACY_INPUT_CONTRACT
 from toolrl.rollout import run_episode
 from toolrl.transformers_policy import TransformersToolPolicy
 
@@ -43,6 +44,11 @@ def main() -> int:
         "--scoring-protocol",
         choices=(SCORING_PROTOCOL, REASON_CODE_SCORING_PROTOCOL),
         default=SCORING_PROTOCOL,
+    )
+    parser.add_argument(
+        "--input-contract",
+        choices=INPUT_CONTRACTS,
+        default=LEGACY_INPUT_CONTRACT,
     )
     parser.add_argument("--input-format", choices=(INPUT_FORMAT, "legacy-v3"), default=INPUT_FORMAT)
     parser.add_argument(
@@ -91,9 +97,11 @@ def main() -> int:
             policy,
             reward_mode=args.reward_mode,
             scoring_protocol=args.scoring_protocol,
+            input_contract=args.input_contract,
         )
         record["run_name"] = args.run_name
         record["scoring_protocol"] = args.scoring_protocol
+        record["input_contract"] = args.input_contract
         record["reward_mode"] = args.reward_mode
         if args.input_intervention != "original":
             record["input_intervention"] = args.input_intervention
@@ -128,6 +136,7 @@ def main() -> int:
         "tasks_sha256": hashlib.sha256(args.tasks.read_bytes()).hexdigest(),
         "limit": args.limit,
         "scoring_protocol": args.scoring_protocol,
+        "input_contract": args.input_contract,
         **summarize_reports(records),
     }
     summary_path = args.output.with_suffix(".summary.json")

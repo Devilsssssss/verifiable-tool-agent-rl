@@ -4,25 +4,45 @@ import inspect
 from collections.abc import Callable
 from copy import deepcopy
 from functools import wraps
-from typing import Any
+from typing import Any, Literal
 
 from .environment import SCORING_PROTOCOL, RetailToolEnvironment
 from .expert import reset_environment
-from .prompts import conversation_prompt
+from .prompts import (
+    INPUT_CONTRACTS,
+    LEGACY_INPUT_CONTRACT,
+    REASON_CODE_INPUT_CONTRACT,
+    conversation_prompt,
+)
 from .schemas import AgentTask
 
 ResponsePolicy = Callable[[list[dict[str, Any]], list[Callable[..., str]]], dict[str, Any]]
 
 
-def environment_tools(environment: RetailToolEnvironment) -> list[Callable[..., str]]:
+def environment_tools(
+    environment: RetailToolEnvironment,
+    *,
+    input_contract: str = LEGACY_INPUT_CONTRACT,
+) -> list[Callable[..., str]]:
+    if input_contract not in INPUT_CONTRACTS:
+        raise ValueError(f"unsupported input contract: {input_contract}")
     return [
-        _tool_adapter(environment, name)
+        _tool_adapter(
+            environment,
+            name,
+            require_reason_code=input_contract == REASON_CODE_INPUT_CONTRACT,
+        )
         for name, method in inspect.getmembers(type(environment), predicate=inspect.isfunction)
         if name not in {"reset", "get_reward"} and not name.startswith("_")
     ]
 
 
-def _tool_adapter(environment: RetailToolEnvironment, name: str) -> Callable[..., str]:
+def _tool_adapter(
+    environment: RetailToolEnvironment,
+    name: str,
+    *,
+    require_reason_code: bool = False,
+) -> Callable[..., str]:
     method = getattr(environment, name)
 
     @wraps(method)
@@ -31,7 +51,22 @@ def _tool_adapter(environment: RetailToolEnvironment, name: str) -> Callable[...
         # Remove only nulls; non-null unknown arguments remain strict failures.
         return method(**{key: value for key, value in arguments.items() if value is not None})
 
-    call.__signature__ = inspect.signature(method)  # type: ignore[attr-defined]
+    signature = inspect.signature(method)
+    if require_reason_code and name == "escalate_to_human":
+        parameters = [
+            parameter.replace(
+                default=inspect.Parameter.empty,
+                annotation=Literal[
+                    "shipped_order_cannot_cancel",
+                    "return_window_expired",
+                ],
+            )
+            if parameter.name == "reason_code"
+            else parameter
+            for parameter in signature.parameters.values()
+        ]
+        signature = signature.replace(parameters=parameters)
+    call.__signature__ = signature  # type: ignore[attr-defined]
     return call
 
 
@@ -41,6 +76,7 @@ def run_episode(
     *,
     reward_mode: str = "shaped",
     scoring_protocol: str = SCORING_PROTOCOL,
+    input_contract: str = LEGACY_INPUT_CONTRACT,
     max_turns: int | None = None,
 ) -> dict[str, Any]:
     environment = RetailToolEnvironment()
@@ -50,13 +86,15 @@ def run_episode(
         reward_mode=reward_mode,
         scoring_protocol=scoring_protocol,
     )
-    messages: list[dict[str, Any]] = list(conversation_prompt(task.prompt))
+    messages: list[dict[str, Any]] = list(
+        conversation_prompt(task.prompt, input_contract=input_contract)
+    )
     turns = max_turns or task.max_steps + 2
     generated_tokens = 0
     stopped_reason = "turn_limit"
 
     for turn_index in range(turns):
-        tools = environment_tools(environment)
+        tools = environment_tools(environment, input_contract=input_contract)
         response = deepcopy(policy(deepcopy(messages), tools))
         response.setdefault("role", "assistant")
         generated_tokens += int(response.pop("_generated_tokens", 0))

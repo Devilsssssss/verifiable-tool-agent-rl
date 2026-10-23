@@ -4,7 +4,6 @@ import argparse
 import hashlib
 import json
 import sys
-from dataclasses import replace
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,25 +12,8 @@ sys.path.insert(0, str(ROOT / "src"))
 from toolrl.environment import REASON_CODE_SCORING_PROTOCOL, RetailToolEnvironment
 from toolrl.expert import grpo_row, reset_environment
 from toolrl.io import load_tasks, write_jsonl
-
-
-def strict_reason_code_task(task):
-    if task.family not in {"cancel_shipped", "return_expired"}:
-        return task
-    reason_code = (
-        "shipped_order_cannot_cancel"
-        if task.family == "cancel_shipped"
-        else "return_window_expired"
-    )
-    goal = dict(task.goal)
-    goal["reason_code"] = reason_code
-    plan = []
-    for step in task.expert_plan:
-        updated = {"tool": step["tool"], "arguments": dict(step["arguments"])}
-        if updated["tool"] == "escalate_to_human":
-            updated["arguments"]["reason_code"] = reason_code
-        plan.append(updated)
-    return replace(task, goal=goal, expert_plan=tuple(plan))
+from toolrl.prompts import LEGACY_INPUT_CONTRACT
+from toolrl.reason_codes import strict_reason_code_task
 
 
 def main() -> int:
@@ -80,6 +62,7 @@ def main() -> int:
                 task,
                 reward_mode="strict_shaped",
                 scoring_protocol=REASON_CODE_SCORING_PROTOCOL,
+                input_contract=LEGACY_INPUT_CONTRACT,
             )
         )
 
@@ -99,6 +82,7 @@ def main() -> int:
         "families": sorted({task.family for task in tasks}),
         "reward_mode": "strict_shaped",
         "scoring_protocol": REASON_CODE_SCORING_PROTOCOL,
+        "input_contract": LEGACY_INPUT_CONTRACT,
         "expert_strict_successes": len(rows),
         "scope": (
             "Final two-seed GRPO attempt initialized from the audited return-boundary-v1 "
